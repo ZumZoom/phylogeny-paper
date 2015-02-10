@@ -602,13 +602,13 @@ construction process and section 4 gives the experimental results.
 
 \section{Definitions and Background}
 
-We define a "phylogenetic tree" as a leaf-labeled tree constructed over a set of taxa. Throughout this paper we assume that trees are rooted and binary, i.e. in-degrees of all nodes, except root, are one, and out-degrees are zero for leaves and two for internal nodes. A "hybridisation network" is a directed acyclic graph with a single root and leaves bijectively labeled by the set of taxa. If the in-degree of a node is greater than one, such node is called reticulation node. In this paper we assume that reticulation nodes have in-degree of two and out-degree of one. We can do this assumption by noting that we can convert a reticulation node with in-degree of three or more to the sequence of reticulation nodes of in-degree two \cite{Y. Wu. Close lower and upper bounds for the minimum reticulate network of multiple phylogenetic trees}. Other nodes are regular tree nodes and have the same properties as in tree.
+We define a "phylogenetic tree" as a leaf-labeled tree constructed over a set of taxa. Throughout this paper we assume that trees are rooted and binary, i.e. in-degrees of all nodes, except root, are one, and out-degrees are zero for leaves and two for internal nodes. A "hybridisation network" is a directed acyclic graph with a single root and leaves bijectively labeled by the set of taxa. If the in-degree of a node is greater than one, such node is called hybridisation node. In this paper we assume that hybridisation nodes have in-degree of two and out-degree of one. We can do this assumption by noting that we can convert a hybridisation node with in-degree of three or more to the sequence of hybridisation nodes of in-degree two \cite{Y. Wu. Close lower and upper bounds for the minimum reticulate network of multiple phylogenetic trees}. Other nodes are regular tree nodes and have the same properties as in tree.
 
-Consider a hybridisation network $N$. Firstly we keep only one of the incoming edges for each reticulation node in $N$. Secondly we contract edges to remove all the nodes of in-degree one and out-degree one. With this two steps we obtain a tree $T'$ from the network $N$.
+Consider a hybridisation network $N$. Firstly we keep only one of the incoming edges for each hybridisation node in $N$. Secondly we contract edges to remove all the nodes of in-degree one and out-degree one. With this two steps we obtain a tree $T'$ from the network $N$.
 
-Now suppose we have a phylogenetic tree $T$ and a hybridisation network $N$. We say that network $N$ \emph{displays} $T$ if we can choose the edges of reticulation nodes in such a way that after edge-contraction obtained tree $T'$ will be equivalent to $T$.
+Now suppose we have a phylogenetic tree $T$ and a hybridisation network $N$. We say that network $N$ \emph{displays} $T$ if we can choose the edges of hybridisation nodes in such a way that after edge-contraction obtained tree $T'$ will be equivalent to $T$.
 
-A "hybridisation number" or "reticulation number" is commonly defined as the sum of in-degrees of all edges minus one. Note that under our assumptions $h(N)$ simply equals the number of reticulation nodes.
+A "hybridisation number" is commonly defined as the sum of in-degrees of all edges minus one. Note that under our assumptions $h(N)$ simply equals the number of reticulation nodes.
 
 $h(N) = \sum\limits_{v != root} (d^-(v) - 1)$
 
@@ -623,14 +623,8 @@ It has been shown that even for the case of $K=2$ construction of such a network
 
 \section{Algorithm}
 
-Algorithm consits of three stages
+The main idea of the algorithm is to look over possible values if hybridisation number and to construct a boolean formula that represent a hybridisation network with fixed hybridisation number. Before doing this search we do some preprocessing and consequently some postprocessing after the network is found.
 
-\begin{enumerate}
-\item Preprocessing
-\item Encoding boolean formula
-\item Solving boolean formula
-\item Postprocessing
-\end{enumerate}
 
 \subsection{Preprocessing}
 
@@ -644,16 +638,32 @@ Replace any subtree that appears identically in all input trees by a leaf with n
 
 For each cluster $A$ replace the subtrees containing it by a leaf with new label and add a new task for processing that consists of deleted subtrees $T'_1, T'_2, ... T'_k$ with leaf set $A$.
 
-After we split out task into a set of less complex tasks, we add a dummy root to each tree of each task along with the new dummy leaf for tree consistency. This is done to ensure that all the trees in the input share common root. This dummy root will be deleted on the postprocessing stage.
+After we split the task into a set of less complex tasks, we add a dummy root to each tree of each task along with the new dummy leaf for tree consistency. This is done to ensure that all the trees in the input share common root. This dummy root will be deleted on the postprocessing stage. At this stage we have a set of tasks that will be solved separately and then their results will be merged at the postprocessing stage.
+
+\subsection{Search of the minimal hybridisation number}
+
+To solve a subtask we need to find the lowest hybridisation number $k$ such that there exists a hybridisation network with this hybridisation number. We look through possible values of $k$ starting from the highest (?? why do we choose max $k$ equals to the size of taxa ??) and construct a boolean formula corresponding to that $k$. We decrease $k$ until the solver can't satisfy the formula, and that means that the previous value of $k$ was the lowest possible. There are another strategies of searching the minimal value of $k$. For example we can start from zero and increase $k$ until the solver will be able to satisfy the formula, or we can use binary search. But in our experiments the most time-consuming computations were with the value of $k_{optimal} - 1$ and consequently results of upwards method were very poor. Binary search results were close to downwards method, but in some cases when binary search tried to satisfy formulas with values of $k$ less than $k_{optimal}$ its results also were poor. This can be explained by an observation that it is much easier to solver to produce an answer if formula is satisfiable than if it is not. In case of unsatisfiable formula solver should check every possible answer to ensure that there is no solution. Obvious method for reducing searching time is to use different heuristics for finding close starting upper and lower bounds of hybridisation number. Possible candidates are PIRN, RIATA-HGT and MURPAR. We do not consider this optimisations in this paper.
 
 \subsection{Encoding boolean formula}
 
+Having a set of trees $T$ over a set of taxa $N$ and fixed hybridisation number $k$ we will construct boolean formula that will be satisfiable iff there exists a hybridisation network that displays each tree in $T$ and its hybridisation number equals to $k$. To do this we first notice that a network over the set of taxa of size $n$ with hybridisation number $k$ will have $2 * (n + k) - 1$ nodes. As we add dummy root and dummy leaf, we finally have $2 * (n + k) + 1$ nodes, $k$ of which are hybridisation nodes, $n$ are leaves and others are usual tree nodes. Now we will describe literals and clauses required to construct boolean formula.
+
+\subsubsection{Network structure encoding}
+
+\subsubsection{Mapping trees to network}
+
+\subsubsection{Heuristics}
+
 \subsection{Solving boolean formula}
+
+To solve generated boolean formula we use a SAT-solver CryptoMiniSat 4.2.0. Choosing the most appropriate solver is not considered in current paper, however several experimentations were made by M. Bonet and K. John \cite {Efficiently Calculating Evolutionary Tree Measures Using SAT Maria Luisa Bonet and Katherine St. John} so it is one of the topics of further research.
 
 \subsection{Postprocessing}
 
-The input is several rooted binary phylogenetic trees
-    
+After solving a task we recover network from the SAT-solver output. After that we delete dummy root and appropriate leaf from the network. And when all the subtasks of the original task are solved, we join their networks in one hybridisation network corresponding to original task.
+
+\section{Trash}
+
 $V, R, L$
 
 \begin{itemize}
