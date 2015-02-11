@@ -646,9 +646,84 @@ To solve a subtask we need to find the lowest hybridisation number $k$ such that
 
 \subsection{Encoding boolean formula}
 
-Having a set of trees $T$ over a set of taxa $N$ and fixed hybridisation number $k$ we will construct boolean formula that will be satisfiable iff there exists a hybridisation network that displays each tree in $T$ and its hybridisation number equals to $k$. To do this we first notice that a network over the set of taxa of size $n$ with hybridisation number $k$ will have $2 * (n + k) - 1$ nodes. As we add dummy root and dummy leaf, we finally have $2 * (n + k) + 1$ nodes, $k$ of which are hybridisation nodes, $n$ are leaves and others are usual tree nodes. Now we will describe literals and clauses required to construct boolean formula.
+Having a set of trees $T$ over a set of taxa $N$ and fixed hybridisation number $k$ we will construct boolean formula that will be satisfiable iff there exists a hybridisation network that displays each tree in $T$ and its hybridisation number equals to $k$. To do this we first notice that a network over the set of taxa of size $n$ with hybridisation number $k$ will have $2 * (n + k) - 1$ nodes (?? why ??). As we add dummy root and dummy leaf, we finally have $2 * (n + k) + 1$ nodes, $k$ of which are hybridisation nodes, $n + 1$ are leaves and others are usual tree nodes. Let $R$ be the set of hybridisation nodes, $L$ be the set of leaves and $V$ be the set of regural nodes. We number all the nodes in such a way that all leaves have numbers in range $[0,n]$, all regular nodes have numbers in range $[n + 1,2n + k]$ and all hybridisation nodes have numbers in range $[2n + k + 1, 2(n + k)]$. And we assume that the number of any leave or regular node is less than number of its parent. Such numeration allows us to define the following sets of nodes for each node $v$: $PC(v)$ is the set of possible children of $v$, $PP(v)$ is the set of possible parents of $v$ and $PU(v)$ is the set of nodes that can be indirect parents of $v$. Now we will describe literals and clauses required to construct boolean formula in conjunctive normal form.
 
 \subsubsection{Network structure encoding}
+
+First of all we encode structure of the network itself. We introduce the following literals: 
+
+\begin{itemize}
+
+\item $l_{v,u}(r_{v,u}) \forall v \in V, u \in PC(v)$ is true iff regular node $v$ has node $u$ as left (right) child.
+
+\item $p_{v,u} \forall v \in L \cup V / root, u \in PP(v)$ is true iff $u$ is parent of regular node $v$.
+
+\item $lp_{v,u}(rp_{v,u}) \forall v \in R, u \in PP(v)$ is true iff $u$ is left (right) parent of hybridisation node $v$.
+
+\item $ch_{v,u} \forall v \in R, u \in PC(v)$ is true iff $u$ is child of hybridisation node $v$.
+
+\end{itemize}
+
+So we have $O((n + k) ^ 2)$ literals for specifying network structure. In practice the number of literals will be much smaller because sets $PP$ and $PC$ always contain less then $n+k$ nodes.
+
+An obvious pattern to allow existence of only one parent or child or any other variable is to say that the node can have at least one true literal and at most one true literal. This can be done in the following way (for example for parents of regular node $v$):
+
+$(\bigvee\limits_{u \in PP(v)} p_{v,u}) \wedge (\bigwedge\limits_{i, j \in PP(v);i < j} (\neg p_{v,i} \vee \neg p_{v,j}))$.
+
+We introduce the following constraints to restrict the network structure:
+
+\begin{itemize}
+
+\item at-most-one and at-least-one clauses for literals $l$, $r$, $p$, $lp$, $rp$, $ch$
+
+\item left child must have less number then the right one. This constraint can be translated as 
+      $(\neg l_{v,u} \vee \neg r_{v,w}) \forall u, w \in PC(v): u \geq w$
+      
+\item same constraint for parents of hybridisation nodes.
+
+\end{itemize}
+
+We should connect parent literals with children literals for network consistency. We do this with the following constraints:
+
+\begin{itemize}
+
+\item if regular node has regular children then children should have this node as parent and vice versa:
+    \begin{itemize}
+    \item $(\neg left_{v,u} \vee parent_{u,v})$ means if $u$ is the left child of $v$ then $v$ should be the parent of $u$
+    \item $(\neg right_{v,u} \vee parent_{u,v})$ means same for the right child
+    \item $(\neg parent_{u,v} \vee left_{v,u} \vee right_{v,u})$ means if $v$ is the parent of $u$ then $v$ is either its right or left child
+    \end{itemize}
+The same idea applies also for other types of parent-child relations.
+
+\item regular parents with hybridisation children
+    \begin{itemize}
+    \item $(\neg left_{v,u} \vee lp_{u,v} \vee rp_{u,v})$
+    \item $(\neg right_{v,u} \vee lp_{u,v} \vee rp_{u,v})$
+    \item $(\neg lp_{u,v} \vee left_{v,u} \vee right_{v,u})$
+    \item $(\neg rp_{u,v} \vee left_{v,u} \vee right_{v,u})$
+    \end{itemize}
+    
+\item hybridisation parents with regular children
+    \begin{itemize}
+    \item ($\neg ch_{v,u} \vee parent_{u,v}$)
+    \item ($\neg parent_{u,v} \vee ch_{v,u}$)
+    \end{itemize}
+    
+\item hybridisation parents with hybridisation children
+    \begin{itemize}
+    \item ($\neg ch_{v,u} \vee lp_{u,v} \vee rp_{u,v}$)
+    \item ($\neg lp_{u,v} \vee ch_{v,u}$)
+    \item ($\neg rp_{u,v} \vee ch_{v,u}$)
+    \end{itemize}
+    
+\item we also should order parents and children of hybridisation nodes, for consistent numeration:
+$\forall v, u, w: v \in R, u \in PC(v), w \in PP(v), w \leq u$:
+    \begin{itemize}
+    \item ($\neg ch_{v,u} \vee \neg lp_{v,w}$)
+    \item ($\neg ch_{v,u} \vee \neg rp_{v,w}$)
+    \end{itemize}
+
+\end{itemize}
 
 \subsubsection{Mapping trees to network}
 
@@ -667,13 +742,6 @@ After solving a task we recover network from the SAT-solver output. After that w
 $V, R, L$
 
 \begin{itemize}
-\item $left_{v,u}, right_{v,u} \forall v \in V, u \in PC(v)$ true iff node $v$ has node $u$ as left (right) child.
-
-\item $parent_{v,u} \forall v \in L \cup V / root, u \in PP(v)$ true iff node $v$ has node $u$ as parent.
-
-\item $lp_{v,u}, rp_{v,u} \forall v \in R, u \in PC(v)$
-
-\item $ch_{v,u} \forall v \in R, u \in PP(v)$
 
 \item $dir_{t,v}, rused_{t,v} \forall t \in T, v \in R$
 
@@ -686,43 +754,6 @@ $V, R, L$
 
 
 Constraints
-\begin{itemize}
-\item at-most-one and at-least-one clauses for variables $left$, $right$, $parent$, $lp$, $rp$, $ch$, $up$, $x$
-\item left child must have number less then the right one. This constraint can be translated as 
-      $(\neg left_{v,u} \vee \neg right_{v,w}) \forall u, w: u \geq w$
-\item same constraints for variables $lp_{v,u}$ and $rp_{v,u}$
-\item constraints to connect parents with children:
-    \begin{itemize}
-    \item ($\neg left_{v,u} \vee parent_{u,v}$)
-    \item ($\neg right_{v,u} \vee parent_{u,v}$)
-    \item ($\neg parent_{u,v} \vee left_{v,u} \vee right_{v,u}$)
-    \end{itemize}
-\item constraints to connect parents with reticulation children
-    \begin{itemize}
-    \item ($\neg left_{v,u} \vee lp_{u,v} \vee rp_{u,v}$)
-    \item ($\neg right_{v,u} \vee lp_{u,v} \vee rp_{u,v}$)
-    \item ($\neg lp_{u,v} \vee left_{v,u} \vee right_{v,u}$)
-    \item ($\neg rp_{u,v} \vee left_{v,u} \vee right_{v,u}$)
-    \end{itemize}
-\item constraints to connect reticulation parents with children
-    \begin{itemize}
-    \item ($\neg ch_{v,u} \vee parent_{u,v}$)
-    \item ($\neg parent_{u,v} \vee ch_{v,u}$)
-    \end{itemize}
-\item constraints to connect reticulation parents with reticulation children
-    \begin{itemize}
-    \item ($\neg ch_{v,u} \vee lp_{u,v} \vee rp_{u,v}$)
-    \item ($\neg lp_{u,v} \vee ch_{v,u}$)
-    \item ($\neg rp_{u,v} \vee ch_{v,u}$)
-    \end{itemize}
-\item constraints to order child and parents of reticulation node. $\forall v, u, w: v \in R, u \in PC(v), u \in V, w \in V, w \leq u$:
-    \begin{itemize}
-    \item ($\neg ch_{v,u} \vee \neg lp_{v,w}$)
-    \item ($\neg ch_{v,u} \vee \neg rp_{v,w}$)
-    \end{itemize}
-\end{itemize}
-
-There were network definition constraints.
 
 Definition of whether network node used to represent a tree:
 \begin{itemize}
