@@ -1,0 +1,309 @@
+\documentclass[runningheads, envcountsame, a4paper]{llncs}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{makeidx}  
+\usepackage{enumerate}
+\usepackage{textcomp}         
+\usepackage{verbatim}
+%\usepackage{subfig}
+\usepackage[caption=false]{subfig}
+
+\begin{document}
+\mainmatter           
+\title{Constructing Parsimonious Hybridization Networks with Multiple Phylogenetic Trees using SAT-solver: Initial Explorations}
+\titlerunning{ } 
+\toctitle{ }
+
+% Shalyto ??
+\author{Vladimir Ulyantsev \and Mikhail Melnik \and Anatoly Shalyto}
+\authorrunning{V. Ulyantsev, M. Melnik, and A. Shalyto} 
+\tocauthor{Vladimir~Ulyantsev, Mikhail~Melnik, Anatoly~Shalyto}
+%
+\institute{ITMO University, Saint-Petersburg, Russia \\
+\email{$\{$ulyantsev,melnik$\}$@rain.ifmo.ru, shalyto@mail.ifmo.ru}}
+
+\maketitle
+\setcounter{footnote}{0}
+
+\begin{abstract}
+  TODO: abstract
+
+  \keywords{TODO}
+\end{abstract}
+
+\section{Introduction}
+
+Phylogenetic network is a powerful tool to model the reticulate
+evolutionary processes (such as horizontal gene transfer and hybrid specification).
+Briefly, phylogenetic network is a directed acyclic graph, which has
+nodes (called reticulation nodes) with more than one incoming edge. Phylogenetic
+networks have been studied by several researchers \cite{huson}, \cite{morrison}, 
+\cite{nakhleh}. There are several formulations of phylogenetic network
+construction problem with various modeling assumptions and different types of input data. 
+In this paper we focus on the specific type of phylogenetic network called hybridization
+network \cite{semple}.
+
+Input data for hybridization network construction is a set of gene trees. Each gene tree
+models the evolutionary history of some gene. Becaues of the reticulate evolutionary events
+these trees can have different topologies. The aim is to construct a phylogenetic network
+containing the smallest possible number of reticulation nodes and displaying each of the input trees. 
+
+Most of the algorithms for phylogenetic network construction are heuristic. However, recently
+an exact algorithm PIRN has been intoduced \cite{wu}. In this paper we introduce a new approach for parsimonius
+phylogenetic network construction based on SAT-solver usage. SAT-solver is a software package designed
+to solve SAT problem, which consists of finding a satisfying assignment for a boolean formula. 
+SAT problem is known to be NP-complete \cite{}, but state-of-the-art SAT-solvers running on the modern hardware 
+are able to solve SAT instances having tens of thousands of variables and hundreds of thousands of clauses in several minutes.
+
+SAT-solver based algorithms have been successfully applied to efficiently calculate evolutionary tree measures \cite{bonet}
+as well as to solve problems in other domains such as
+finite-state machine induction \cite{heule}, software verification \cite{}, ...
+
+The general outline of our approach is to convert an instance of phylogenetic network construction 
+problem to an instance of SAT problem (a Boolean formula), solve it using SAT-solver and then convert 
+the satisfying assignment into the phylogenetic network. The formula construction process should ensure that
+the network has the minimal possible number of reticulate nodes.
+
+Our approach leads to an exact algorithm outperforming PIRN on ??? testcases out of ???
+
+The paper is structured as follows. Section 2 gives the formal definitions, section 3 describes the Boolean formula
+construction process and section 4 gives the experimental results.
+
+\section{Definitions and Background}
+
+We define a "phylogenetic tree" as a leaf-labeled tree constructed over a set of taxa. Throughout this paper we assume that trees are rooted and binary, i.e. in-degrees of all nodes, except root, are one, and out-degrees are zero for leaves and two for internal nodes. A "hybridisation network" is a directed acyclic graph with a single root and leaves bijectively labeled by the set of taxa. If the in-degree of a node is greater than one, such node is called hybridisation node. In this paper we assume that hybridisation nodes have in-degree of two and out-degree of one. We can do this assumption by noting that we can convert a hybridisation node with in-degree of three or more to the sequence of hybridisation nodes of in-degree two \cite{Y. Wu. Close lower and upper bounds for the minimum reticulate network of multiple phylogenetic trees}. Other nodes are regular tree nodes and have the same properties as in tree.
+
+Consider a hybridisation network $N$. Firstly we keep only one of the incoming edges for each hybridisation node in $N$. Secondly we contract edges to remove all the nodes of in-degree one and out-degree one. With this two steps we obtain a tree $T'$ from the network $N$.
+
+Now suppose we have a phylogenetic tree $T$ and a hybridisation network $N$. We say that network $N$ \emph{displays} $T$ if we can choose the edges of hybridisation nodes in such a way that after edge-contraction obtained tree $T'$ will be equivalent to $T$.
+
+A "hybridisation number" is commonly defined as the sum of in-degrees of all edges minus one. Note that under our assumptions $h(N)$ simply equals the number of reticulation nodes.
+
+$h(N) = \sum\limits_{v != root} (d^-(v) - 1)$
+
+Suppose we are given a set of $K$ phylogenetic trees $T_1, T_2, ... T_k$ over the same set of taxa. The minimum hybridisation network for that set of trees is a network $N_{min}$ that displays each tree and has the lowest hybridisation number possible.
+
+The most parsimonious hybridisation network problem.
+
+Given a set of $K$ phylogenetic trees $T_1, T_2, ... T_k$ over the same set of taxa, construct the minimum hybridisation network for that set of trees.
+
+It has been shown that even for the case of $K=2$ construction of such a network is NP-complete problem \cite {M. Bordewich and C. Semple. Computing the minimum number of hybridization events for a consistent evolutionary history.}. As far as we know there exists only one algorithm for the construction of the most parsimonious hybridisation network \cite {wu}.
+
+
+\section{Algorithm}
+
+The main idea of the algorithm is to look over possible values if hybridisation number and to construct a boolean formula that represent a hybridisation network with fixed hybridisation number. Before doing this search we do some preprocessing and consequently some postprocessing after the network is found.
+
+
+\subsection{Preprocessing}
+
+Before the actual boolean formula encoding we modify the input and split it into several tasks to reduce the size and complexity of the problem. We do this according to the rules from \cite {Efficiently Calculating Evolutionary Tree Measures Using SAT Maria Luisa Bonet1 and Katherine St. John2}. To define those rules we first need to define the term "cluster". A set of taxa $A$ is a cluster in trees $T_1, T_2, ... T_k$ if there exists a node in each tree that has all the taxa from $A$ in its descendants.
+
+\textbf{Subtree reduction rule}
+
+Replace any subtree that appears identically in all input trees by a leaf with new label.
+
+\textbf{Cluster reduction rule}
+
+For each cluster $A$ replace the subtrees containing it by a leaf with new label and add a new task for processing that consists of deleted subtrees $T'_1, T'_2, ... T'_k$ with leaf set $A$.
+
+After we split the task into a set of less complex tasks, we add a dummy root to each tree of each task along with the new dummy leaf for tree consistency. This is done to ensure that all the trees in the input share common root. This dummy root will be deleted on the postprocessing stage. At this stage we have a set of tasks that will be solved separately and then their results will be merged at the postprocessing stage.
+
+\subsection{Search of the minimal hybridisation number}
+
+To solve a subtask we need to find the lowest hybridisation number $k$ such that there exists a hybridisation network with this hybridisation number. We look through possible values of $k$ starting from the highest (?? why do we choose max $k$ equals to the size of taxa ??) and construct a boolean formula corresponding to that $k$. We decrease $k$ until the solver can't satisfy the formula, and that means that the previous value of $k$ was the lowest possible. There are another strategies of searching the minimal value of $k$. For example we can start from zero and increase $k$ until the solver will be able to satisfy the formula, or we can use binary search. But in our experiments the most time-consuming computations were with the value of $k_{optimal} - 1$ and consequently results of upwards method were very poor. Binary search results were close to downwards method, but in some cases when binary search tried to satisfy formulas with values of $k$ less than $k_{optimal}$ its results also were poor. This can be explained by an observation that it is much easier to solver to produce an answer if formula is satisfiable than if it is not. In case of unsatisfiable formula solver should check every possible answer to ensure that there is no solution. Obvious method for reducing searching time is to use different heuristics for finding close starting upper and lower bounds of hybridisation number. Possible candidates are PIRN, RIATA-HGT and MURPAR. We do not consider this optimisations in this paper.
+
+\subsection{Encoding boolean formula}
+
+Having a set of trees $T$ over a set of taxa $N$ and fixed hybridisation number $k$ we will construct boolean formula that will be satisfiable iff there exists a hybridisation network that displays each tree in $T$ and its hybridisation number equals to $k$. To do this we first notice that a network over the set of taxa of size $n$ with hybridisation number $k$ will have $2 * (n + k) - 1$ nodes (?? why ??). As we add dummy root and dummy leaf, we finally have $2 * (n + k) + 1$ nodes, $k$ of which are hybridisation nodes, $n + 1$ are leaves and others are usual tree nodes. Let $R$ be the set of hybridisation nodes, $L$ be the set of leaves and $V$ be the set of regural nodes. We number all the nodes in such a way that all leaves have numbers in range $[0,n]$, all regular nodes have numbers in range $[n + 1,2n + k]$ and all hybridisation nodes have numbers in range $[2n + k + 1, 2(n + k)]$. And we assume that the number of any leave or regular node is less than number of its parent. Such numeration allows us to define the following sets of nodes for each node $v$: $PC(v)$ is the set of possible children of $v$, $PP(v)$ is the set of possible parents of $v$ and $PU(v)$ is the set of nodes that can be indirect parents of $v$. Now we will describe literals and clauses required to construct boolean formula in conjunctive normal form.
+
+\subsubsection{Network structure encoding}
+
+First of all we encode structure of the network itself. We introduce the following literals: 
+
+\begin{itemize}
+
+\item $l_{v,u}(r_{v,u}) \forall v \in V, u \in PC(v)$ is true iff regular node $v$ has node $u$ as left (right) child.
+
+\item $p_{v,u} \forall v \in L \cup V / root, u \in PP(v)$ is true iff $u$ is parent of regular node $v$.
+
+\item $lp_{v,u}(rp_{v,u}) \forall v \in R, u \in PP(v)$ is true iff $u$ is left (right) parent of hybridisation node $v$.
+
+\item $ch_{v,u} \forall v \in R, u \in PC(v)$ is true iff $u$ is child of hybridisation node $v$.
+
+\end{itemize}
+
+So we have $O((n + k) ^ 2)$ literals for specifying network structure. In practice the number of literals will be much smaller because sets $PP$ and $PC$ always contain less then $n+k$ nodes.
+
+An obvious pattern to allow existence of only one parent or child or any other variable is to say that the node can have at least one true literal and at most one true literal. This can be done in the following way (for example for parents of regular node $v$):
+
+$(\bigvee\limits_{u \in PP(v)} p_{v,u}) \wedge (\bigwedge\limits_{i, j \in PP(v);i < j} (\neg p_{v,i} \vee \neg p_{v,j}))$.
+
+We introduce the following constraints to restrict the network structure:
+
+\begin{itemize}
+
+\item at-most-one and at-least-one clauses for literals $l$, $r$, $p$, $lp$, $rp$, $ch$
+
+\item left child must have less number then the right one. This constraint can be translated as 
+      $(\neg l_{v,u} \vee \neg r_{v,w}) \forall u, w \in PC(v): u \geq w$
+      
+\item same constraint for parents of hybridisation nodes.
+
+\end{itemize}
+
+We should connect parent literals with children literals for network consistency. We do this with the following constraints:
+
+\begin{itemize}
+
+\item if regular node has regular children then children should have this node as parent and vice versa:
+    \begin{itemize}
+    \item $(\neg left_{v,u} \vee parent_{u,v})$ means if $u$ is the left child of $v$ then $v$ should be the parent of $u$
+    \item $(\neg right_{v,u} \vee parent_{u,v})$ means same for the right child
+    \item $(\neg parent_{u,v} \vee left_{v,u} \vee right_{v,u})$ means if $v$ is the parent of $u$ then $v$ is either its right or left child
+    \end{itemize}
+The same idea applies also for other types of parent-child relations.
+
+\item regular parents with hybridisation children
+    \begin{itemize}
+    \item $(\neg left_{v,u} \vee lp_{u,v} \vee rp_{u,v})$
+    \item $(\neg right_{v,u} \vee lp_{u,v} \vee rp_{u,v})$
+    \item $(\neg lp_{u,v} \vee left_{v,u} \vee right_{v,u})$
+    \item $(\neg rp_{u,v} \vee left_{v,u} \vee right_{v,u})$
+    \end{itemize}
+    
+\item hybridisation parents with regular children
+    \begin{itemize}
+    \item ($\neg ch_{v,u} \vee parent_{u,v}$)
+    \item ($\neg parent_{u,v} \vee ch_{v,u}$)
+    \end{itemize}
+    
+\item hybridisation parents with hybridisation children
+    \begin{itemize}
+    \item ($\neg ch_{v,u} \vee lp_{u,v} \vee rp_{u,v}$)
+    \item ($\neg lp_{u,v} \vee ch_{v,u}$)
+    \item ($\neg rp_{u,v} \vee ch_{v,u}$)
+    \end{itemize}
+    
+\item we also should order parents and children of hybridisation nodes, for consistent numeration:
+$\forall v, u, w: v \in R, u \in PC(v), w \in PP(v), w \leq u$:
+    \begin{itemize}
+    \item ($\neg ch_{v,u} \vee \neg lp_{v,w}$)
+    \item ($\neg ch_{v,u} \vee \neg rp_{v,w}$)
+    \end{itemize}
+
+\end{itemize}
+
+\subsubsection{Mapping trees to network}
+
+\subsubsection{Heuristics}
+
+\subsection{Solving boolean formula}
+
+To solve generated boolean formula we use a SAT-solver CryptoMiniSat 4.2.0. Choosing the most appropriate solver is not considered in current paper, however several experimentations were made by M. Bonet and K. John \cite {Efficiently Calculating Evolutionary Tree Measures Using SAT Maria Luisa Bonet and Katherine St. John} so it is one of the topics of further research.
+
+\subsection{Postprocessing}
+
+After solving a task we recover network from the SAT-solver output. After that we delete dummy root and appropriate leaf from the network. And when all the subtasks of the original task are solved, we join their networks in one hybridisation network corresponding to original task.
+
+\section{Trash}
+
+$V, R, L$
+
+\begin{itemize}
+
+\item $dir_{t,v}, rused_{t,v} \forall t \in T, v \in R$
+
+\item $used_{t,v}, \forall t \in T, v \in V$
+
+\item $up_{t,v,u}, \forall t \in T, v \in V, u \in PU(v)$
+
+\item $x_{t,s,v}, \forall t \in T, s \in V(t), v \in V$
+\end{itemize}
+
+
+Constraints
+
+Definition of whether network node used to represent a tree:
+\begin{itemize}
+\item $\forall t, v, u: t \in T, v \in R, u \in PP(v), u \in V$:
+    \begin{itemize}
+    \item $(\neg dir_{t,v} \wedge lp_{v,u}) \Rightarrow \neg used_{t,u}$ 
+    \item $(dir_{t,v} \wedge rp_{v,u}) \Rightarrow \neg used_{t,u}$ 
+    \end{itemize}
+\item define the $rused$ variables $\forall t, v, u: t \in T, v \in R, u \in PC(v)$
+    \begin{itemize}
+    \item if $u \in V \cup L$ then reticulation node used $ch_{t,v,u} \Rightarrow rused_{t,v}$
+    \item $u \in R : (ch_{t,v,u} \wedge \neg rused_{t,u}) \Rightarrow \neg rused_{t,v}$
+
+    \item $u \in R : (lp_{t,u,v} \wedge \neg dir_{t,u}) \Rightarrow \neg rused_{t,v}$
+    \item $u \in R : (rp_{t,u,v} \wedge dir_{t,u}) \Rightarrow \neg rused_{t,v}$
+
+    \item $u \in R : (lp_{t,u,v} \wedge dir_{t,u} \wedge rused_{t,u}) \Rightarrow rused_{t,v}$
+    \item $u \in R : (rp_{t,u,v} \wedge \neg dir_{t,u} \wedge rused_{t,u}) \Rightarrow rused_{t,v}$
+    \end{itemize}
+\item connect $rused$ variables with $used$ variables. $\forall t, v, u: t \in T, v \in R, u \in PP(v), u \in V$:
+    $((lp_{v,u} \vee rp_{v,u}) \wedge \neg rused_{t,v}) \Rightarrow \neg used_{t,u}$
+\end{itemize}
+
+$up$ variables definition ($\forall t \in T$):
+\begin{itemize}
+\item $v \in V \cup L, u \in V, w \in PU(u)$
+    \begin{itemize}
+    \item $(parent_{v,u} \wedge used_{t,u}) \Rightarrow up_{t,v,u}$
+    \item $(parent_{v,u} \wedge up_{t,v,u}) \Rightarrow used_{t,u}$
+    \item $(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
+    \item $(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \Rightarrow up_{t,u,w}$
+    \end{itemize}
+\item $v \in V \cup L, u \in R, w \in PU(u)$
+    \begin{itemize}
+    \item if $w \leq v$: $parent_{v,u} \Rightarrow \neg up_{t,u,w}$
+    \item else: $(parent_{v,u} \wedge up_{t,u,w}) \Rightarrow \neg up_{t,v,w}$
+    \end{itemize}                                                                         
+\item $v \in R, u \in PP(v), u \in V, w \in PU(u)$
+    \begin{itemize}
+    \item $(lp_{v,u} \wedge dir_{t,v} \wedge used_{t,u}) \Rightarrow up_{t,v,u}$
+    \item $(rp_{v,u} \wedge \neg dir_{t,v} \wedge used_{t,u}) \Rightarrow up_{t,v,u}$
+
+    \item $(lp_{v,u} \wedge dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
+    \item $(rp_{v,u} \wedge \neg dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
+    \end{itemize}
+\item $v \in R, u \in PP(v), u \in R, w \in PU(u)$
+    \begin{itemize}
+    \item $(lp_{v,u} \wedge dir_{t,v} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
+    \item $(rp_{v,u} \wedge \neg dir_{t,v} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
+    \end{itemize}
+\end{itemize}
+
+Finally, $x$ variables constraints, that connects given data (trees $t \in T$) with our model:
+\begin{itemize}
+\item $x_{t,s,v} \Rightarrow \neg x_{t,q,v}$
+\item $x_{t,s,v} \Rightarrow used_{t,s}$
+\item if $s$ is the root of the tree: $x_{t,s,root}$
+\item $\forall s \in L(t): x_{t,p(s),v} \Rightarrow up_{t,s,v}$
+\item $\forall s \in V(t) / root(t), v \in V, u \in PU(v)$:
+    \begin{itemize}
+    \item $(x_{t,s,v} \wedge x_{t,p(s),u}) \Rightarrow up_{t,v,u}$
+    \item $(x_{t,s,v} \wedge up_{t,v,u}) \Rightarrow x_{t,p(s),u}$
+    \end{itemize}
+\item $\forall s \in V(t) / root(t), v \in V, u \in V, u < v$: 
+    $x_{t,s,v} \Rightarrow \neg x_{t,p(s),u}$
+    
+
+\end{itemize}
+
+
+
+\section*{Acknowledgements}
+
+%Authors would like to thank Mail.Ru Group Company for the data provided.
+Authors would like to thank Daniil Chivilikhin, Igor Buzhinsky and Andrey Filchenkov for useful comments.
+This work was financially supported by the Government of Russian Federation, Grant 074-U01,
+and also partially supported by RFBR, research project No.~14-07-31337 mol\_a.
+
+\bibliographystyle{splncs}
+\bibliography{main}
+\clearpage
+\end{document}
