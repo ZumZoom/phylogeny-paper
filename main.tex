@@ -137,9 +137,9 @@ First of all we encode structure of the network itself. We introduce the followi
 
 \end{itemize}
 
-So we have $O((n + k) ^ 2)$ literals for specifying network structure. In practice the number of literals will be much smaller because sets $PP$ and $PC$ always contain less then $n+k$ nodes.
+This takes $O((n + k)^2)$ literals for specifying network structure, and if we notice that $k < n$ then it is equal to $O(n^2)$ literals.
 
-An obvious pattern to allow existence of only one parent or child or any other variable is to say that the node can have at least one true literal and at most one true literal. This can be done in the following way (for example for parents of regular node $v$):
+To encode the uniqueness of parents and children we use an obvious pattern that requires $O(n^2)$ clauses. We say that the node can have at least one real parent (child or something) and at most one true parent. This can be done in the following way (for example for parents of regular node $v$):
 
 $(\bigvee\limits_{u \in PP(v)} p_{v,u}) \wedge (\bigwedge\limits_{i, j \in PP(v);i < j} (\neg p_{v,i} \vee \neg p_{v,j}))$.
 
@@ -152,7 +152,7 @@ We introduce the following constraints to restrict the network structure:
 \item left child must have less number then the right one. This constraint can be translated as 
       $(\neg l_{v,u} \vee \neg r_{v,w}) \forall u, w \in PC(v): u \geq w$
       
-\item same constraint for parents of hybridisation nodes.
+\item same constraint for left and right parents of hybridisation nodes.
 
 \end{itemize}
 
@@ -200,6 +200,22 @@ $\forall v, u, w: v \in R, u \in PC(v), w \in PP(v), w \leq u$:
 
 \subsubsection{Mapping trees to network}
 
+To show that network should contain all the input trees we add literals that represent mapping the tree over the network. (?? The intution for these literals is that ??):
+
+\begin{itemize}
+
+\item $x_{t,s,v}, \forall t \in T, s \in V(t), v \in V$ is true iff regular node $v$ represents node $s$ from tree $t$
+
+\item $dir_{t,v} \forall t \in T, v \in R$ is true iff left parent edge of hybridisation node $v$ is used to display tree $t$ and it is false in case of right edge
+
+\item $rused_{t,v} \forall t \in T, v \in R$ is true iff child of hybridisation node $v$ is used to display tree $t$
+
+\item $used_{t,v}, \forall t \in T, v \in V$ is true iff regular node $v$ is used to display tree $t$
+
+\item $up_{t,v,u}, \forall t \in T, v \in V, u \in PU(v)$ is true iff regular node $u$ can be indirect parent of node $v$ in reference to tree $t$
+
+\end{itemize}
+
 \subsubsection{Heuristics}
 
 \subsection{Solving boolean formula}
@@ -211,20 +227,6 @@ To solve generated boolean formula we use a SAT-solver CryptoMiniSat 4.2.0. Choo
 After solving a task we recover network from the SAT-solver output. After that we delete dummy root and appropriate leaf from the network. And when all the subtasks of the original task are solved, we join their networks in one hybridisation network corresponding to original task.
 
 \section{Trash}
-
-$V, R, L$
-
-\begin{itemize}
-
-\item $dir_{t,v}, rused_{t,v} \forall t \in T, v \in R$
-
-\item $used_{t,v}, \forall t \in T, v \in V$
-
-\item $up_{t,v,u}, \forall t \in T, v \in V, u \in PU(v)$
-
-\item $x_{t,s,v}, \forall t \in T, s \in V(t), v \in V$
-\end{itemize}
-
 
 Constraints
 
@@ -300,10 +302,6 @@ Finally, $x$ variables constraints, that connects given data (trees $t \in T$) w
 
 \section*{Acknowledgements}
 
-%Authors would like to thank Mail.Ru Group Company for the data provided.
-Authors would like to thank Daniil Chivilikhin, Igor Buzhinsky and Andrey Filchenkov for useful comments.
-This work was financially supported by the Government of Russian Federation, Grant 074-U01,
-and also partially supported by RFBR, research project No.~14-07-31337 mol\_a.
 
 \bibliographystyle{splncs}
 \bibliography{main}
