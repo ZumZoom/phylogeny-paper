@@ -43,7 +43,7 @@ networks have been studied by several (?) researchers \cite{huson2010phylogeneti
 \cite{nakhleh2011evolutionary}. There are several formulations of phylogenetic network
 construction problem with various modeling assumptions and different types of input data. 
 In this paper we focus on the specific type of phylogenetic network called hybridization
-network \cite{semple2006hybridization}.
+network \cite{semple2006hybridization}, \cite{chen2010hybridnet}.
 
 Input data for hybridization network construction is a set of gene trees. % it's not always true - there can be different data, need to rephrase 
 Each gene tree models the evolutionary history of some gene. % some words about "taxa"?
@@ -51,15 +51,14 @@ Because of the reticulate evolutionary events these trees can have different top
 The aim is to construct a phylogenetic network
 containing the smallest possible number of reticulation nodes and displaying each of the input trees. 
 
-Most of the algorithms for phylogenetic network construction are heuristic [??].
-% Also, most of algorithms deals with only two trees
-However, recently an exact algorithm PIRN has been intoduced \cite{wu2013algorithm}.
+Most of the algorithms for phylogenetic network construction are heuristic [??] and they usually deal with only two trees.
+However, recently an exact algorithm PIRN has been intoduced \cite{wu2013algorithm} which is able to process more than two input trees.
 
 In this paper we introduce a new approach for parsimonius
-phylogenetic network construction based on satisfiabilty (SAT) solvers.
+phylogenetic network construction from multiply input trees based on satisfiabilty (SAT) solvers.
 %SAT-solver is a software package designed
 %to solve SAT problem, which consists of finding a satisfying assignment for a boolean formula. 
-SAT problem is known to be NP-complete \cite{}, but state-of-the-art SAT-solvers running on the modern hardware 
+SAT problem is known to be NP-complete \cite{bordewich2007computing}, but state-of-the-art SAT-solvers running on the modern hardware 
 are able to solve SAT instances having tens of thousands of variables and hundreds of thousands of clauses in several minutes.
 
 SAT-solver based algorithms have been successfully applied to efficiently calculate evolutionary tree measures \cite{bonet2009efficiently}
