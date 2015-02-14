@@ -16,13 +16,11 @@
 \titlerunning{ } 
 \toctitle{ }
 
-% Shalyto ??
-\author{Vladimir Ulyantsev \and Mikhail Melnik \and Anatoly Shalyto}
-\authorrunning{V. Ulyantsev, M. Melnik, and A. Shalyto} 
-\tocauthor{Vladimir~Ulyantsev, Mikhail~Melnik, Anatoly~Shalyto}
-%
+\author{Vladimir Ulyantsev \and Mikhail Melnik}
+\authorrunning{V. Ulyantsev, M. Melnik} 
+\tocauthor{Vladimir~Ulyantsev, Mikhail~Melnik}
 \institute{ITMO University, Saint-Petersburg, Russia \\
-\email{$\{$ulyantsev,melnik$\}$@rain.ifmo.ru, shalyto@mail.ifmo.ru}}
+\email{$\{$ulyantsev,melnik$\}$@rain.ifmo.ru}}
 
 \maketitle
 \setcounter{footnote}{0}
@@ -202,21 +200,190 @@ $\forall v, u, w: v \in R, u \in PC(v), w \in PP(v), w \leq u$:
 
 \subsubsection{Mapping trees to network}
 
-To show that network should contain all the input trees we add literals that represent mapping the tree over the network. (?? The intution for these literals is that ??):
+To show that network should contain all the input trees we add literals that represent mapping the tree over the network. We should note that leaves of the trees are bijectively mapped to leaves of the network. (?? The intution for these literals is that ??):
 
 \begin{itemize}
 
-\item $x_{t,s,v}, \forall t \in T, s \in V(t), v \in V$ is true iff regular node $v$ represents node $s$ from tree $t$
+\item $x_{t,s,v}, \forall t \in T, s \in V(t), v \in V$ is true iff regular node $v$ represents node $s$ from tree $t$, i.e. bijective mapping
 
-\item $dir_{t,v} \forall t \in T, v \in R$ is true iff left parent edge of hybridisation node $v$ is used to display tree $t$ and it is false in case of right edge
+\item $dir_{t,v} \forall t \in T, v \in R$ is true iff left parent edge of hybridisation node $v$ is used to display tree $t$ and it is false in case of right edge. I.e. we specify direction of necessary parent to display current tree
 
 \item $rused_{t,v} \forall t \in T, v \in R$ is true iff child of hybridisation node $v$ is used to display tree $t$
 
 \item $used_{t,v}, \forall t \in T, v \in V$ is true iff regular node $v$ is used to display tree $t$
 
-\item $up_{t,v,u}, \forall t \in T, v \in V, u \in PU(v)$ is true iff regular node $u$ can be indirect parent of node $v$ in reference to tree $t$
+\item $up_{t,v,u}, \forall t \in T, v \in V, u \in PU(v)$ is true iff regular node $u$ is indirect parent of node $v$ in the network but it is its direct parent in tree $t$
 
 \end{itemize}
+
+We need $up$ variables because edge contraction is used for displaying trees, so it is not enough to only consider direct parents in network.
+
+Now we define constraints that show whether network node is used to display an input tree:
+
+\begin{itemize}
+
+\item First of all we forbid meaningless values of $used$ literals.
+
+	If the direction of parent of hybridisation node for specific tree is defined, we shouldn't use another branch:
+    \begin{itemize}
+    \item $\forall t \in T, v \in R, u \in PP(v):$
+    
+    $(\neg dir_{t,v} \wedge lp_{v,u}) \rightarrow \neg used_{t,u}$
+    
+    $(dir_{t,v} \wedge rp_{v,u}) \rightarrow \neg used_{t,u}$
+    \end{itemize}
+	Also if we don't use current hybridisation node for current tree, we shouldn't use its parents for current tree:
+	\begin{itemize}
+	\item $\forall t \in T, v \in R, u \in PP(v):$
+	
+	$(lp_{v,u} \wedge \neg rused_{t,v}) \rightarrow \neg used_{t,u}$
+	
+	$(rp_{v,u} \wedge \neg rused_{t,v}) \rightarrow \neg used_{t,u}$
+	\end{itemize}
+
+\item Secondly we limit usage of hybridisation nodes.
+
+	$\forall t \in T, v \in R, u \in PP(v):$
+	
+    If $u \in V \cup L$, i.e. $u$ is regular tree node. Then we have no choice but to use hybridisation node:
+
+    \begin{itemize}
+	\item $ch_{t,v,u} \rightarrow rused_{t,v}$
+	\end{itemize}
+    
+    Then consider $u \in R$.
+    
+    If child is not used for current tree then we shouldn't use the node itself:
+
+    \begin{itemize}
+    \item $\neg rused_{t,u} \rightarrow \neg rused_{t,v}$
+    \end{itemize}
+
+	We also should forbid usage of current node when its direction differs from direction specified in its child, and we should use it if its direction matches direction specified in its child and its child itself is used:
+
+    \begin{itemize}
+    \item $(lp_{t,u,v} \wedge \neg dir_{t,u}) \rightarrow \neg rused_{t,v}$
+    \item $(rp_{t,u,v} \wedge dir_{t,u}) \rightarrow \neg rused_{t,v}$
+    \item $(lp_{t,u,v} \wedge dir_{t,u} \wedge rused_{t,u}) \rightarrow rused_{t,v}$
+    \item $(rp_{t,u,v} \wedge \neg dir_{t,u} \wedge rused_{t,u}) \rightarrow rused_{t,v}$
+    \end{itemize}
+    
+\item At-least-one and at-most one clauses for literals $x$ and $up$. Note that in case of $x$ literals we have restriction that at most one node from tree corresponds to the network node, and that at most one node from network corresponds to the tree node.
+
+\item If we know that node from tree bijectively matches some network node then we should use that node for that tree:
+    \begin{itemize}
+	\item $x_{t,s,v} \rightarrow used_{t,s}$
+    \end{itemize}
+    Note that due to dummy roots we know that all tree roots match network root:
+    \begin{itemize}
+	\item $x_{t,s,root}$
+    \end{itemize}
+
+\item Constraints for regular node $v$ and its relation to direct tree parent from tree $t$.
+
+	If parent $u$ of node $v$ is used in tree $t$, then it is its direct parent in corresponding tree and vice versa:
+
+    \begin{itemize}
+    \item $\forall t \in T,v \in V \cup L, u \in PP(v), u \in V$
+    
+    $(parent_{v,u} \wedge used_{t,u}) \rightarrow up_{t,v,u}$
+    
+    $(parent_{v,u} \wedge up_{t,v,u}) \rightarrow used_{t,u}$
+	\end {itemize}
+	
+	If we do not use parent $u$ of node $v$ in tree $t$, we should traverse direct tree parent from $u$ to $v$ and vice versa:
+
+	\begin{itemize}
+    \item $\forall t \in T,v \in V \cup L, u \in PP(v), u \in V, w \in PP(u)$
+    
+	$(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$
+    
+    $(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$
+	\end {itemize}
+	
+	If parent $u$ of node $v$ is hybridisation node, we should care about order of $v$ and parents of $u$:
+
+	\begin{itemize}
+    \item $\forall t \in T,v \in V \cup L, u \in PP(v), u \in R, w \in PU(u)$
+
+	if $w \leq v$ then $w$ can not be parent of $u$ considering tree $t$:
+	
+	$parent_{v,u} \rightarrow \neg up_{t,u,w}$
+	
+	otherwise we should traverse direct tree parents from $u$ to $v$ (?? and maybe vice versa ??):
+	
+	$(parent_{v,u} \wedge up_{t,u,w}) \rightarrow \neg up_{t,v,w}$
+	
+	(?? $(parent_{v,u} \wedge up_{t,v,w}) \rightarrow \neg up_{t,u,w}$ ??)
+    \end{itemize}
+
+\item Constraints for hybridisation node $v$ and its relation to direct tree parent from $t$.
+
+	If direction of parent $u$ matches direction specified in node $v$ and parent is used in $t$ then is is direct parent of $v$ in $t$:
+
+    \begin{itemize}
+    \item $\forall t \in T, v \in R, u \in PP(v), u \in V$
+	
+	$(lp_{v,u} \wedge dir_{t,v} \wedge used_{t,u}) \rightarrow up_{t,v,u}$
+    
+    $(rp_{v,u} \wedge \neg dir_{t,v} \wedge used_{t,u}) \rightarrow up_{t,v,u}$
+	\end {itemize}
+	
+	If parent $u$ us not used in tree $t$ then we should traverse direct tree parents from $u$ to $v$ ( ?? and maybe vice versa ??):
+
+    \begin{itemize}
+    \item $\forall t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+	
+    $(lp_{v,u} \wedge dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$
+
+    $(rp_{v,u} \wedge \neg dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$
+	\end {itemize}
+	
+	If parent $u$ is a hybridisation node we also should traverse direct tree parents from $u$ to $v$ ( ?? and maybe vice versa ??):
+	
+    \begin{itemize}
+    \item $\forall t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+	
+    $(lp_{v,u} \wedge dir_{t,v} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$
+
+    $(rp_{v,u} \wedge \neg dir_{t,v} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$
+	\end {itemize}
+
+\item Consider restrictions on $x$ literals.
+
+	If $v$ is leaf and its parent $u$ bijectively maps to node $tu$ in tree $t$ then it is direct parent.	    
+
+	\begin{itemize}
+    \item $\forall t \in T, v \in L, u \in PP(v), tu \in V(t)$
+
+	$x_{t,tu,u} \rightarrow up_{t,v,u}$
+	\end {itemize}
+	
+	If node $v$ and its parent $u$ both bijectively map to child and parent in tree $t$, then $u$ is direct parent of $v$ considering tree $t$.
+
+	\begin{itemize}
+    \item $\forall t \in T, v \in V, u \in PP(v), tv \in V(t), tu = p(tv)$
+
+	$(x_{t,tv,v} \wedge x_{t,tu,u}) \rightarrow up_{t,v,u}$
+	\end {itemize}
+	
+	On the other hand if we know that $u$ is direct parent of $v$ in tree $t$, then we also have bijective mapping for them.
+
+	\begin{itemize}
+    \item $\forall t \in T, v \in V, u \in PP(v), tv \in V(t), tu = p(tv)$
+
+	$(x_{t,tv,v} \wedge up_{t,v,u}) \rightarrow x_{t,tu,u}$
+	\end {itemize}
+	
+	We also should care about numeration. Thus we can not map node $u$ from network to node $tu$ from tree if number of $u$ is less than number of its child $v$.
+
+	\begin{itemize}
+    \item $\forall t \in T, v \in V, u \in PP(v), tv \in V(t), tu = p(tv), u < v$
+
+    $x_{t,tv,v} \rightarrow \neg x_{t,tu,u}$
+	\end {itemize}
+	
+\end {itemize}
 
 \subsubsection{Heuristics}
 
@@ -228,82 +395,9 @@ To solve generated boolean formula we use a SAT-solver CryptoMiniSat 4.2.0. Choo
 
 After solving a task we recover network from the SAT-solver output. After that we delete dummy root and appropriate leaf from the network. And when all the subtasks of the original task are solved, we join their networks in one hybridisation network corresponding to original task.
 
-\section{Trash}
-
-Constraints
-
-Definition of whether network node used to represent a tree:
-\begin{itemize}
-\item $\forall t, v, u: t \in T, v \in R, u \in PP(v), u \in V$:
-    \begin{itemize}
-    \item $(\neg dir_{t,v} \wedge lp_{v,u}) \Rightarrow \neg used_{t,u}$ 
-    \item $(dir_{t,v} \wedge rp_{v,u}) \Rightarrow \neg used_{t,u}$ 
-    \end{itemize}
-\item define the $rused$ variables $\forall t, v, u: t \in T, v \in R, u \in PC(v)$
-    \begin{itemize}
-    \item if $u \in V \cup L$ then reticulation node used $ch_{t,v,u} \Rightarrow rused_{t,v}$
-    \item $u \in R : (ch_{t,v,u} \wedge \neg rused_{t,u}) \Rightarrow \neg rused_{t,v}$
-
-    \item $u \in R : (lp_{t,u,v} \wedge \neg dir_{t,u}) \Rightarrow \neg rused_{t,v}$
-    \item $u \in R : (rp_{t,u,v} \wedge dir_{t,u}) \Rightarrow \neg rused_{t,v}$
-
-    \item $u \in R : (lp_{t,u,v} \wedge dir_{t,u} \wedge rused_{t,u}) \Rightarrow rused_{t,v}$
-    \item $u \in R : (rp_{t,u,v} \wedge \neg dir_{t,u} \wedge rused_{t,u}) \Rightarrow rused_{t,v}$
-    \end{itemize}
-\item connect $rused$ variables with $used$ variables. $\forall t, v, u: t \in T, v \in R, u \in PP(v), u \in V$:
-    $((lp_{v,u} \vee rp_{v,u}) \wedge \neg rused_{t,v}) \Rightarrow \neg used_{t,u}$
-\end{itemize}
-
-$up$ variables definition ($\forall t \in T$):
-\begin{itemize}
-\item $v \in V \cup L, u \in V, w \in PU(u)$
-    \begin{itemize}
-    \item $(parent_{v,u} \wedge used_{t,u}) \Rightarrow up_{t,v,u}$
-    \item $(parent_{v,u} \wedge up_{t,v,u}) \Rightarrow used_{t,u}$
-    \item $(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
-    \item $(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \Rightarrow up_{t,u,w}$
-    \end{itemize}
-\item $v \in V \cup L, u \in R, w \in PU(u)$
-    \begin{itemize}
-    \item if $w \leq v$: $parent_{v,u} \Rightarrow \neg up_{t,u,w}$
-    \item else: $(parent_{v,u} \wedge up_{t,u,w}) \Rightarrow \neg up_{t,v,w}$
-    \end{itemize}                                                                         
-\item $v \in R, u \in PP(v), u \in V, w \in PU(u)$
-    \begin{itemize}
-    \item $(lp_{v,u} \wedge dir_{t,v} \wedge used_{t,u}) \Rightarrow up_{t,v,u}$
-    \item $(rp_{v,u} \wedge \neg dir_{t,v} \wedge used_{t,u}) \Rightarrow up_{t,v,u}$
-
-    \item $(lp_{v,u} \wedge dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
-    \item $(rp_{v,u} \wedge \neg dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
-    \end{itemize}
-\item $v \in R, u \in PP(v), u \in R, w \in PU(u)$
-    \begin{itemize}
-    \item $(lp_{v,u} \wedge dir_{t,v} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
-    \item $(rp_{v,u} \wedge \neg dir_{t,v} \wedge up_{t,u,w}) \Rightarrow up_{t,v,w}$
-    \end{itemize}
-\end{itemize}
-
-Finally, $x$ variables constraints, that connects given data (trees $t \in T$) with our model:
-\begin{itemize}
-\item $x_{t,s,v} \Rightarrow \neg x_{t,q,v}$
-\item $x_{t,s,v} \Rightarrow used_{t,s}$
-\item if $s$ is the root of the tree: $x_{t,s,root}$
-\item $\forall s \in L(t): x_{t,p(s),v} \Rightarrow up_{t,s,v}$
-\item $\forall s \in V(t) / root(t), v \in V, u \in PU(v)$:
-    \begin{itemize}
-    \item $(x_{t,s,v} \wedge x_{t,p(s),u}) \Rightarrow up_{t,v,u}$
-    \item $(x_{t,s,v} \wedge up_{t,v,u}) \Rightarrow x_{t,p(s),u}$
-    \end{itemize}
-\item $\forall s \in V(t) / root(t), v \in V, u \in V, u < v$: 
-    $x_{t,s,v} \Rightarrow \neg x_{t,p(s),u}$
-    
-
-\end{itemize}
-
-
+\section{Results}
 
 \section*{Acknowledgements}
-
 
 \bibliographystyle{splncs}
 \bibliography{main}
