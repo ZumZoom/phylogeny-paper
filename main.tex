@@ -127,13 +127,21 @@ First of all we encode structure of the network itself. We introduce the followi
 
 \begin{itemize}
 
-\item $l_{v,u}(r_{v,u}) \forall v \in V, u \in PC(v)$ is true iff regular node $v$ has node $u$ as left (right) child.
+\item $\forall v \in V, u \in PC(v) : l_{v,u}(r_{v,u})$ 
 
-\item $p_{v,u} \forall v \in L \cup V / root, u \in PP(v)$ is true iff $u$ is parent of regular node $v$.
+$l (r)$ is true iff regular node $v$ has node $u$ as left (right) child.
 
-\item $lp_{v,u}(rp_{v,u}) \forall v \in R, u \in PP(v)$ is true iff $u$ is left (right) parent of hybridisation node $v$.
+\item $\forall v \in L \cup V / root, u \in PP(v) : p_{v,u}$ 
 
-\item $ch_{v,u} \forall v \in R, u \in PC(v)$ is true iff $u$ is child of hybridisation node $v$.
+$p$ is true iff $u$ is parent of regular node $v$.
+
+\item $\forall v \in R, u \in PP(v) : lp_{v,u}(rp_{v,u})$ 
+
+$lp (rp)$ is true iff $u$ is left (right) parent of hybridisation node $v$.
+
+\item $\forall v \in R, u \in PC(v) : ch_{v,u}$ 
+
+$ch$ is true iff $u$ is child of hybridisation node $v$.
 
 \end{itemize}
 
@@ -141,7 +149,7 @@ This takes $O((n + k)^2)$ literals for specifying network structure, and if we n
 
 To encode the uniqueness of parents and children we use an obvious pattern that requires $O(n^2)$ clauses. We say that the node can have at least one real parent (child or something) and at most one true parent. This can be done in the following way (for example for parents of regular node $v$):
 
-$(\bigvee\limits_{u \in PP(v)} p_{v,u}) \wedge (\bigwedge\limits_{i, j \in PP(v);i < j} (\neg p_{v,i} \vee \neg p_{v,j}))$.
+$(\bigvee\limits_{u \in PP(v)} p_{v,u}) \wedge (\bigwedge\limits_{i, j \in PP(v);i < j} (p_{v,i} \rightarrow \neg p_{v,j}))$.
 
 We introduce the following constraints to restrict the network structure:
 
@@ -150,7 +158,10 @@ We introduce the following constraints to restrict the network structure:
 \item at-most-one and at-least-one clauses for literals $l$, $r$, $p$, $lp$, $rp$, $ch$
 
 \item left child must have less number then the right one. This constraint can be translated as 
-      $(\neg l_{v,u} \vee \neg r_{v,w}) \forall u, w \in PC(v): u \geq w$
+      
+      $\forall u, w \in PC(v): u \geq w$
+
+      $l_{v,u} \rightarrow \neg r_{v,w}$
       
 \item same constraint for left and right parents of hybridisation nodes.
 
@@ -162,38 +173,49 @@ We should connect parent literals with children literals for network consistency
 
 \item if regular node has regular children then children should have this node as parent and vice versa:
     \begin{itemize}
-    \item $(\neg left_{v,u} \vee parent_{u,v})$ means if $u$ is the left child of $v$ then $v$ should be the parent of $u$
-    \item $(\neg right_{v,u} \vee parent_{u,v})$ means same for the right child
-    \item $(\neg parent_{u,v} \vee left_{v,u} \vee right_{v,u})$ means if $v$ is the parent of $u$ then $v$ is either its right or left child
+    \item if $u$ is the left child of $v$ then $v$ should be the parent of $u$
+    
+    $left_{v,u} \rightarrow parent_{u,v}$
+    \item the same for the right child
+    
+    $right_{v,u} \rightarrow parent_{u,v}$ 
+    \item if $v$ is the parent of $u$ then $v$ is either its right or left child
+    
+    $parent_{u,v} \rightarrow (left_{v,u} \vee right_{v,u})$
     \end{itemize}
+
+\end{itemize}
+
 The same idea applies also for other types of parent-child relations.
 
+\begin{itemize}
 \item regular parents with hybridisation children
     \begin{itemize}
-    \item $(\neg left_{v,u} \vee lp_{u,v} \vee rp_{u,v})$
-    \item $(\neg right_{v,u} \vee lp_{u,v} \vee rp_{u,v})$
-    \item $(\neg lp_{u,v} \vee left_{v,u} \vee right_{v,u})$
-    \item $(\neg rp_{u,v} \vee left_{v,u} \vee right_{v,u})$
+    \item $left_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$
+    \item $right_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$
+    \item $lp_{u,v} \rightarrow (left_{v,u} \vee right_{v,u})$
+    \item $rp_{u,v} \rightarrow (left_{v,u} \vee right_{v,u})$
     \end{itemize}
     
 \item hybridisation parents with regular children
     \begin{itemize}
-    \item ($\neg ch_{v,u} \vee parent_{u,v}$)
-    \item ($\neg parent_{u,v} \vee ch_{v,u}$)
+    \item $ch_{v,u} \rightarrow parent_{u,v}$
+    \item $parent_{u,v} \rightarrow ch_{v,u}$
     \end{itemize}
     
 \item hybridisation parents with hybridisation children
     \begin{itemize}
-    \item ($\neg ch_{v,u} \vee lp_{u,v} \vee rp_{u,v}$)
-    \item ($\neg lp_{u,v} \vee ch_{v,u}$)
-    \item ($\neg rp_{u,v} \vee ch_{v,u}$)
+    \item $ch_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$
+    \item $lp_{u,v} \rightarrow ch_{v,u}$
+    \item $rp_{u,v} \rightarrow ch_{v,u}$
     \end{itemize}
     
-\item we also should order parents and children of hybridisation nodes, for consistent numeration:
-$\forall v, u, w: v \in R, u \in PC(v), w \in PP(v), w \leq u$:
+\item we also should order parents and children of hybridisation nodes, for consistent numeration
+
+	$\forall v, u, w: v \in R, u \in PC(v), w \in PP(v): w \leq u$
     \begin{itemize}
-    \item ($\neg ch_{v,u} \vee \neg lp_{v,w}$)
-    \item ($\neg ch_{v,u} \vee \neg rp_{v,w}$)
+    \item $ch_{v,u} \rightarrow \neg lp_{v,w}$
+    \item $ch_{v,u} \rightarrow \neg rp_{v,w}$
     \end{itemize}
 
 \end{itemize}
@@ -204,19 +226,29 @@ To show that network should contain all the input trees we add literals that rep
 
 \begin{itemize}
 
-\item $x_{t,s,v}, \forall t \in T, s \in V(t), v \in V$ is true iff regular node $v$ represents node $s$ from tree $t$, i.e. bijective mapping
+\item $\forall t \in T, s \in V(t), v \in V : x_{t,s,v}$
 
-\item $dir_{t,v} \forall t \in T, v \in R$ is true iff left parent edge of hybridisation node $v$ is used to display tree $t$ and it is false in case of right edge. I.e. we specify direction of necessary parent to display current tree
+$x$ is true iff regular node $v$ represents node $s$ from tree $t$, i.e. $x$ literals represent bijective mapping of network nodes to tree nodes
 
-\item $rused_{t,v} \forall t \in T, v \in R$ is true iff child of hybridisation node $v$ is used to display tree $t$
+\item $\forall t \in T, v \in R : dir_{t,v}$
 
-\item $used_{t,v}, \forall t \in T, v \in V$ is true iff regular node $v$ is used to display tree $t$
+$dir$ is true iff left parent edge of hybridisation node $v$ is used to display tree $t$ and it is false in case of right edge, i.e. it specifies direction of necessary parent to display current tree
 
-\item $up_{t,v,u}, \forall t \in T, v \in V, u \in PU(v)$ is true iff regular node $u$ is indirect parent of node $v$ in the network but it is its direct parent in tree $t$
+\item $\forall t \in T, v \in R : rused_{t,v}$
+
+$rused$ is true iff child of hybridisation node $v$ is used to display tree $t$
+
+\item $\forall t \in T, v \in V : used_{t,v}$
+
+$used$ is true iff regular node $v$ is used to display tree $t$
+
+\item $\forall t \in T, v \in V, u \in PU(v) : up_{t,v,u}$
+
+$up$ is true iff regular node $u$ is indirect parent of node $v$ in the network but it is its direct parent in tree $t$
 
 \end{itemize}
 
-We need $up$ variables because edge contraction is used for displaying trees, so it is not enough to only consider direct parents in network.
+We use $up$ variables because edge contraction is used for displaying trees, so it is not enough to only consider direct parents in network.
 
 Now we define constraints that show whether network node is used to display an input tree:
 
@@ -313,8 +345,6 @@ Now we define constraints that show whether network node is used to display an i
 	otherwise we should traverse direct tree parents from $u$ to $v$ (?? and maybe vice versa ??):
 	
 	$(parent_{v,u} \wedge up_{t,u,w}) \rightarrow \neg up_{t,v,w}$
-	
-	(?? $(parent_{v,u} \wedge up_{t,v,w}) \rightarrow \neg up_{t,u,w}$ ??)
     \end{itemize}
 
 \item Constraints for hybridisation node $v$ and its relation to direct tree parent from $t$.
@@ -387,15 +417,45 @@ Now we define constraints that show whether network node is used to display an i
 
 \subsubsection{Heuristics}
 
+\begin{itemize}
+	\item We add some heuristic constraints by noticing an obvious fact that number of node in network can not be less than the size of its subtree and it can not be greater than $|t| - depth(tv)$.
+
+	\begin{itemize}
+    \item $\forall t \in T, v \in V, tv \in V(t), tv < |subtree(tv)|$
+
+    $\neg x_{t,tv,v}$
+    
+    \item $\forall t \in T, v \in V, tv \in V(t), tv > |t - depth(tv)|$
+    
+    $\neg x_{t,tv,v}$
+	\end {itemize}
+	
+	\item Consider node $tv_1$ in tree $t_1$ and node $tv_2$ in tree $t_2$ such that thier subtrees have disjoint set of taxa. Then these nodes can not be mapped to the same node in network.
+	
+	\begin{itemize}
+    \item $\forall t_1, t_2 \in T, v \in V, tv_1 \in V(t_1), tv_2 \in V(t_2)$
+
+    $\neg x_{t_1,tv_1,v} \vee \neg x_{t_2,tv_2,v}$
+
+	\end {itemize}
+
+\end {itemize}
+
 \subsection{Solving boolean formula}
 
 To solve generated boolean formula we use a SAT-solver CryptoMiniSat 4.2.0. Choosing the most appropriate solver is not considered in current paper, however several experimentations were made by M. Bonet and K. John \cite {bonet2009efficiently} so it is one of the topics of further research.
 
 \subsection{Postprocessing}
 
-After solving a task we recover network from the SAT-solver output. After that we delete dummy root and appropriate leaf from the network. And when all the subtasks of the original task are solved, we join their networks in one hybridisation network corresponding to original task.
+After solving a task we recover network from the SAT-solver output. After that we delete dummy root and appropriate leaf from the network. And when all the subtasks of the original task are solved, we merge their networks into one hybridisation network corresponding to original task.
 
 \section{Results}
+
+To test performance of our algorithm we evaluated it on a grass (Poaceae) dataset provided by the Grass Phylogeny Working Group (Grass Phylogeny Working Group, 2001). We compared results our method with results of PIRN in exact and in heuristic modes. 
+
+\section{Discussion}
+
+Testing shows that our method outperform exact PIRN algorithm in all cases.
 
 \section*{Acknowledgements}
 
