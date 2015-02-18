@@ -125,14 +125,18 @@ and complexity of the problem. We do this according to the rules from \cite {bon
 rules we first need to define the term "cluster". A set of taxa $A$ is a cluster in trees $T_1, T_2, ... T_k$ if there 
 exists a node in each tree that has all the taxa from $A$ in its descendants.
 
-\textbf{Sub-tree reduction rule}
+\begin{enumerate}
+
+\item \textbf{Sub-tree reduction rule}
 
 Replace any sub-tree that appears identically in all input trees by a leaf with new label.
 
-\textbf{Cluster reduction rule}
+\item \textbf{Cluster reduction rule}
 
 For each cluster $A$ replace the sub-trees containing it by a leaf with new label and add a new task for processing 
 that consists of deleted sub-trees $T'_1, T'_2, ... T'_k$ with leaf set $A$.
+
+\end{enumerate}
 
 After we split the task into a set of less complex tasks, we add a dummy root to each tree of each task along with 
 the new dummy leaf for tree consistency. This is done to ensure that all the trees in the input share common root. 
@@ -150,7 +154,7 @@ zero and increase $k$ until the solver will be able to satisfy the formula, or w
 experiments the most time-consuming computations were with the value of $k_{optimal} - 1$ and consequently results of 
 upwards method were very poor. Binary search results were close to downwards method, but in some cases when binary search 
 tried to satisfy formulas with values of $k$ less than $k_{optimal}$ its results also were poor. This can be explained by 
-an observation that it is much easier to solver to produce an answer if formula is satisfiable than if it is not. In case 
+an observation that it is much easier for solver to produce an answer if formula is satisfiable than if it is not. In case 
 of unsatisfiable formula solver should check every possible answer to ensure that there is no solution. Obvious method 
 for reducing searching time is to use different heuristics for finding close starting upper and lower bounds of 
 hybridisation number. Possible candidates are PIRN, RIATA-HGT and MURPAR. We do not consider this optimisations in this paper.
@@ -161,19 +165,19 @@ Having a set of trees $T$ over a set of taxa $N$ and fixed hybridisation number 
 that will be satisfiable iff there exists a hybridisation network that displays each tree in $T$ and its hybridisation 
 number equals to $k$. To do this we first notice that a network over the set of taxa of size $n$ with hybridisation number 
 $k$ will have $2 * (n + k) - 1$ nodes (?? why ??). As we add dummy root and dummy leaf, we finally have $2 * (n + k) + 1$ nodes, 
-$k$ of which are hybridisation nodes, $n + 1$ are leaves and others are usual tree nodes. Let $R$ be the set of hybridisation 
-nodes, $L$ be the set of leaves and $V$ be the set of regular nodes. We number all the nodes in such a way that all leaves 
-have numbers in range $[0,n]$, all regular nodes have numbers in range $[n + 1,2n + k]$ and all hybridisation nodes have numbers 
-in range $[2n + k + 1, 2(n + k)]$. And we assume that the number of any leave or regular node is less than number of its parent. 
-Such numeration allows us to define the following sets of nodes for each node $v$: $PC(v)$ is the set of possible children of $v$, 
-$PP(v)$ is the set of possible parents of $v$ and $PU(v)$ is the set of nodes that can be indirect parents of $v$. Now we will 
-describe literals and clauses required to construct boolean formula in conjunctive normal form.
+$k$ of which are hybridisation nodes, $n + 1$ are leaves and others are usual tree nodes. We numerate all the nodes in such a way 
+that all leaves have numbers in range $[0,n]$, all regular nodes have numbers in range $[n + 1,2n + k]$ and all hybridisation nodes have numbers 
+in range $[2n + k + 1, 2(n + k)]$. And we assume that the number of any leave or regular node is less than number of its parent. This is done to 
+avoid consideration of isomoprhic networks during SAT solving. Such numeration allows us to define the following sets of nodes for each node 
+$v$: $PC(v)$ is the set of possible children of $v$, $PP(v)$ is the set of possible parents of $v$ and $PU(v)$ is the set of nodes that can 
+be indirect parents of $v$. Also let $R$ be the set of hybridisation nodes, $L$ be the set of leaves and $V$ be the set of regular nodes. 
+Now we will describe literals and clauses required to construct boolean formula in conjunctive normal form.
 
-\subsubsection{Network structure encoding}
+\subsubsection{Network structure encoding} 
 
 First of all we encode structure of the network itself. We introduce the following literals: 
 
-\begin{itemize}
+\begin{enumerate}
 
 \item $\forall v \in V, u \in PC(v) : l_{v,u}(r_{v,u})$ 
 
@@ -191,85 +195,140 @@ $lp (rp)$ is true iff $u$ is left (right) parent of hybridisation node $v$.
 
 $ch$ is true iff $u$ is child of hybridisation node $v$.
 
-\end{itemize}
+\end{enumerate}
 
-This takes $O((n + k)^2)$ literals for specifying network structure, and if we notice that $k < n$ then it is equal 
-to $O(n^2)$ literals.
+This takes $O((n + k)^2)$ literals for specifying network structure, and by noticing that $k < n$ we have $O(n^2)$ literals.
 
-To encode the uniqueness of parents and children we use an obvious pattern that requires $O(n^2)$ clauses. We say 
-that the node can have at least one real parent (child or something) and at most one true parent. This can be done 
-in the following way (for example for parents of regular node $v$):
+To encode the uniqueness of parents and children we use an obvious pattern that requires $O(n^2)$ clauses for each node. We say 
+that the node can have at least one parent (child or something) and at most one parent. This can be expressed 
+in the following way (for example for parents of regular node $v$): 
 
 $(\bigvee\limits_{u \in PP(v)} p_{v,u}) \wedge (\bigwedge\limits_{i, j \in PP(v);i < j} (p_{v,i} \rightarrow \neg p_{v,j}))$.
 
-We introduce the following constraints to restrict the network structure:
+Using this pattern we add uniqueness constraints for literals $l$, $r$, $p$, $lp$, $rp$, $ch$. We also add constraints to order numbers of children of regular nodes and parents of hybridisation nodes.
 
-\begin{itemize}
+Network will be consistent if for every pair of nodes parent relation implies child relaton and vice versa. So we add constraints that connect parent literals with children literals for all the types of nodes.
 
-\item at-most-one and at-least-one clauses for literals $l$, $r$, $p$, $lp$, $rp$, $ch$
+And the last step in network construction is to care about numeration around hybridisation nodes. To do this we add constraints to fix 
+relative numbers of children and parents of hybridisation nodes. 
 
-\item left child must have less number then the right one. This constraint can be translated as 
-      
-      $\forall u, w \in PC(v): u \geq w$
+The proposed constraints are listed in Table~\ref{network-table}. Thus as we need $O(n^2)$ clauses for each node to represent uniquness of 
+its parents and children and $O(n)$ clauses for each node to represent parents-children relation, we finally get $O(n^3)$ clauses in total 
+to represent network structure.
 
-      $l_{v,u} \rightarrow \neg r_{v,w}$
-      
-\item same constraint for left and right parents of hybridisation nodes.
-
-\end{itemize}
-
-We should connect parent literals with children literals for network consistency. We do this with the following constraints:
-
-\begin{itemize}
-
-\item if regular node has regular children then children should have this node as parent and vice versa:
-    \begin{itemize}
-    \item if $u$ is the left child of $v$ then $v$ should be the parent of $u$
-    
-    $left_{v,u} \rightarrow parent_{u,v}$
-    \item the same for the right child
-    
-    $right_{v,u} \rightarrow parent_{u,v}$ 
-    \item if $v$ is the parent of $u$ then $v$ is either its right or left child
-    
-    $parent_{u,v} \rightarrow (left_{v,u} \vee right_{v,u})$
-    \end{itemize}
-
-\end{itemize}
-
-The same idea applies also for other types of parent-child relations.
-
-\begin{itemize}
-\item regular parents with hybridisation children
-    \begin{itemize}
-    \item $left_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$
-    \item $right_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$
-    \item $lp_{u,v} \rightarrow (left_{v,u} \vee right_{v,u})$
-    \item $rp_{u,v} \rightarrow (left_{v,u} \vee right_{v,u})$
-    \end{itemize}
-    
-\item hybridisation parents with regular children
-    \begin{itemize}
-    \item $ch_{v,u} \rightarrow parent_{u,v}$
-    \item $parent_{u,v} \rightarrow ch_{v,u}$
-    \end{itemize}
-    
-\item hybridisation parents with hybridisation children
-    \begin{itemize}
-    \item $ch_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$
-    \item $lp_{u,v} \rightarrow ch_{v,u}$
-    \item $rp_{u,v} \rightarrow ch_{v,u}$
-    \end{itemize}
-    
-\item we also should order parents and children of hybridisation nodes, for consistent numeration
-
-	$\forall v, u, w: v \in R, u \in PC(v), w \in PP(v): w \leq u$
-    \begin{itemize}
-    \item $ch_{v,u} \rightarrow \neg lp_{v,w}$
-    \item $ch_{v,u} \rightarrow \neg rp_{v,w}$
-    \end{itemize}
-
-\end{itemize}
+\begin{table}
+\centering
+\caption{Clauses for network structure encoding}
+\scalebox{1.05}{
+\begin{tabular}{l | l}
+  Clauses & Range \\
+  
+  \hline
+  $p_{v,u_1} \vee ... \vee p_{v,u_k}$ &
+  $v \in V, u_1 ... u_k \in PP(v)$
+  \\
+  $p_{v,u} \rightarrow \neg p_{v,w}$ &
+  $v \in V, u, w \in PP(v)$
+  \\
+  
+  \hline
+  $l_{v,u_1} \vee ... \vee l_{v,u_k}$ &
+  $v \in V, u_1 ... u_k \in PC(v)$
+  \\
+  $l_{v,u} \rightarrow \neg l_{v,w}$ &
+  $v \in V, u, w \in PC(v)$
+  \\
+  $r_{v,u_1} \vee ... \vee r_{v,u_k}$ &
+  $v \in V, u_1 ... u_k \in PC(v)$
+  \\
+  $r_{v,u} \rightarrow \neg r_{v,w}$ &
+  $v \in V, u, w \in PC(v)$
+  \\
+  $l_{v,u} \rightarrow \neg r_{v,w}$ &
+  $v \in V, u, w \in PC(v): u \geq w$
+  \\
+  
+  \hline
+  $ch_{v,u_1} \vee ... \vee ch_{v,u_k}$ &
+  $v \in R, u_1 ... u_k \in PC(v)$
+  \\
+  $ch_{v,u} \rightarrow \neg ch_{v,w}$ &
+  $v \in R, u, w \in PC(v)$
+  \\
+  
+  \hline
+  $lp_{v,u_1} \vee ... \vee lp_{v,u_k}$ &
+  $v \in R, u_1 ... u_k \in PP(v)$
+  \\
+  $lp_{v,u} \rightarrow \neg lp_{v,w}$ &
+  $v \in R, u, w \in PP(v)$
+  \\
+  $rp_{v,u_1} \vee ... \vee rp_{v,u_k}$ &
+  $v \in R, u_1 ... u_k \in PP(v)$
+  \\
+  $rp_{v,u} \rightarrow \neg rp_{v,w}$ &
+  $v \in R, u, w \in PP(v)$
+  \\
+  $lp_{v,u} \rightarrow \neg rp_{v,w}$ &
+  $v \in R, u, w \in PP(v) : u \geq w$
+  \\
+  
+  \hline
+  $left_{v,u} \rightarrow parent_{u,v}$ &
+  $v \in V, u \in V, u \in PC(v)$
+  \\
+  $right_{v,u} \rightarrow parent_{u,v}$ &
+  $v \in V, u \in V, u \in PC(v)$
+  \\
+  $parent_{u,v} \rightarrow (left_{v,u} \vee right_{v,u})$ &
+  $v \in V, u \in V, u \in PC(v)$
+  \\
+  
+  \hline
+  $left_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$ &
+  $v \in V, u \in R, u \in PC(v)$
+  \\
+  $right_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$ &
+  $v \in V, u \in R, u \in PC(v)$
+  \\
+  $lp_{u,v} \rightarrow (left_{v,u} \vee right_{v,u})$ &
+  $v \in V, u \in R, u \in PC(v)$
+  \\
+  $rp_{u,v} \rightarrow (left_{v,u} \vee right_{v,u})$ &
+  $v \in V, u \in R, u \in PC(v)$
+  \\
+  
+  \hline 
+  $ch_{v,u} \rightarrow parent_{u,v}$ &
+  $v \in R, u \in V, u \in PC(v)$
+  \\
+  $parent_{u,v} \rightarrow ch_{v,u}$ &
+  $v \in R, u \in V, u \in PC(v)$
+  \\
+  
+  \hline
+  $ch_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$ &
+  $v \in R, u \in R, u \in PC(v)$
+  \\
+  $lp_{u,v} \rightarrow ch_{v,u}$ &
+  $v \in R, u \in R, u \in PC(v)$
+  \\
+  $rp_{u,v} \rightarrow ch_{v,u}$ &
+  $v \in R, u \in R, u \in PC(v)$
+  \\
+  
+  \hline
+  $ch_{v,u} \rightarrow \neg lp_{v,w}$ &
+  $v \in R, u \in PC(v), w \in PP(v): w \leq u$
+  \\
+  $ch_{v,u} \rightarrow \neg rp_{v,w}$ &
+  $v \in R, u \in PC(v), w \in PP(v): w \leq u$
+  \\
+  
+\end{tabular}
+}
+\label{network-table}
+\end{table}
 
 \subsubsection{Mapping trees to network}
 
