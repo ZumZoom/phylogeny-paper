@@ -28,7 +28,7 @@
 \begin{abstract}
   TODO: abstract
 
-  \keywords{TODO}
+  \keywords{Hybridisation networks, Boolean satisfiability, TODO}
 \end{abstract}
 
 \section{Introduction}
@@ -50,9 +50,9 @@ Because of the reticulate evolutionary events these trees can have different top
 The aim is to construct a hybridization network containing the smallest possible number of 
 reticulation nodes and displaying each of the input trees. 
 
-Most of the algorithms for hybridization network construction are heuristic [add PIRN from Wu and some other heuristic algo] 
+Most of the algorithms for hybridization network construction are heuristic \cite{wu2013algorithm}, \cite{park2012murpar} 
 and they usually deal with only two trees.
-However, recently an exact algorithm PIRN has been introduced \cite{wu2013algorithm} which is able to process more than two input trees.
+However, recently an exact algorithm PIRN$_C$ has been introduced \cite{wu2013algorithm} which is able to process more than two input trees.
 
 In this paper we introduce a new approach for parsimonious
 hybridization network construction from multiply input trees based on satisfiability (SAT) solvers.
@@ -62,14 +62,14 @@ are able to solve SAT instances having tens of thousands of variables and hundre
 
 SAT-solver based algorithms have been successfully applied to efficiently calculate evolutionary tree measures \cite{bonet2009efficiently}
 as well as to solve problems in other domains such as
-finite-state machine induction \cite{heule2010exact}, software verification \cite{}, ...
+finite-state machine induction \cite{heule2010exact}, software verification \cite{}.
 
 The general outline of our approach is to convert an instance of hybridization network construction 
 problem to an instance of SAT problem (a Boolean formula), solve it using SAT-solver and then convert 
 the satisfying assignment into the hybridization network. The formula construction process should ensure that
 the network has the minimal possible number of reticulate nodes.
 
-Our approach leads to an exact algorithm outperforming PIRN on ??? test cases out of ???
+Our approach leads to an exact algorithm that outperforms PIRN$_{CH}$ on all the test cases.
 
 The paper is structured as follows. Section 2 gives the formal definitions, section 3 describes the Boolean formula
 construction process and section 4 gives the experimental results.
@@ -157,7 +157,7 @@ tried to satisfy formulas with values of $k$ less than $k_{optimal}$ its results
 an observation that it is much easier for solver to produce an answer if formula is satisfiable than if it is not. In case 
 of unsatisfiable formula solver should check every possible answer to ensure that there is no solution. Obvious method 
 for reducing searching time is to use different heuristics for finding close starting upper and lower bounds of 
-hybridisation number. Possible candidates are PIRN, RIATA-HGT and MURPAR. We do not consider this optimisations in this paper.
+hybridisation number. Possible candidates are PIRN$_{CH}$, RIATA-HGT and MURPAR. We do not consider this optimisations in this paper.
 
 \subsection{Encoding boolean formula}
 
@@ -600,14 +600,32 @@ After solving a task we recover network from the SAT-solver output. After that w
 leaf from the network. And when all the subtasks of the original task are solved, we merge their networks into one 
 hybridisation network corresponding to original task.
 
-\section{Results}
+\section{Experiments}
 
 To test performance of our algorithm we evaluated it on a grass (Poaceae) dataset provided by the Grass Phylogeny Working Group 
-(Grass Phylogeny Working Group, 2001). We compared results our method with results of PIRN in exact and in heuristic modes. 
+(Grass Phylogeny Working Group, 2001). All experiments were performed using a machine with an AMD Phenom II X6 1090T 3.2 GHz 
+processor on Ubuntu 14.04. All tests were run with time limit equal to 1000 seconds. For comparison we also ran PIRN$_C$ and PIRN$_{CH}$ 
+on the same test cases. 
+
+9 out of 57 test cases were not solved even by heurstic algorithms in time. Our algorithm was able to produce optimal answer for 28
+tests. From these 28 test cases PIRN$_C$ was able to solve only 21 and in all of them hybridisation number was less than 6. 
+On all the tests running time of PIRN$_C$ was worse than running time of our algorithm.
+Even PIRN$_{CH}$ did not solve 2 of these 28 tests in time and its running time was better than running time of our algorithm only
+on 5 tests and significantly worse on 2 tests. 12 more test cases were not solved by PIRN$_C$ and our algorithm did not find an optimal network for them, but was able to produce non-optimal network. PIRN$_{CH}$ did not solve 3 of these cases in time, produced less optimal 
+network on 1 test case and produced more optimal network on 2 test cases. It appeared that in 2 of these test cases both our algorithm 
+and PIRN$_{CH}$ found an optimal network, and on 1 only our algorithm produced optimal answer. 8 more test cases had equal trees in input, 
+so they had an obvious answer and we excluded them from consideration.
+
+Experiments showed that sometimes our algorithm is able to find an optimal network but then it spends a bunch of time trying to find network 
+with hybridisation number one less than optimal and that time is higher than reasonable limit. Sometimes we can avoid such behaviour by 
+first finding close lower bound on hybridisation number which will allow not to waste time on useless computation in some cases. Also we found 
+that it also costs a lot of time to build a network with a very high hybridisation number when minimum hybridisation number is not so high. 
+Thus upper bounds on hybridisation number will also be very useful and will save lots of computational time.
 
 \section{Discussion}
 
-Testing shows that our method outperform exact PIRN algorithm in all cases.
+We proposed an algorithm for construction an exact parsimonious hybridisation network from multiply trees. Experiments show that our method outperform PIRN$_{CH}$ algorithm in all cases and perform reasonably well comparing to heuristic PIRN$_C$. However in cases of high hybridisatrion numbers search and construction of optimal network  is still very challenging problem. In future we plan to use existing 
+heuristics and estimations on lower and upper bounds on hybridisation number to limit searching bounds and reduce running time of our algorithm.
 
 \section*{Acknowledgements}
 
