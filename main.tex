@@ -111,6 +111,15 @@ It has been shown that even for the case of $K=2$ construction of such a network
 \cite {bordewich2007computing}. As far as we know there exists only one algorithm for the construction of the most 
 parsimonious hybridisation network \cite {wu2013algorithm}.
 
+\begin{figure}
+  \centering
+  \includegraphics[width=1in]{pics/inp1.eps}
+  \includegraphics[width=1in]{pics/inp2.eps}
+  \includegraphics[width=1in]{pics/inp3.eps}
+  \includegraphics[width=1.2in]{pics/ans.eps}
+  \caption{An illustration of a hybridisation network for three trees with two hybridisation nodes.}
+  \label{dfa-example}
+\end{figure}
 
 \section{Algorithm}
 
@@ -527,12 +536,18 @@ subtrees then they can not be mapped to the same node in network.
   $(lp_{v,u} \wedge dir_{t,v} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
   $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
   \\
-  
+
+  $(lp_{v,u} \wedge dir_{t,v} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  \\
+    
   $(rp_{v,u} \wedge \neg dir_{t,v} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
   $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
   \\
   
-  maybe from $v$ to $u$ too ?? & \\
+  $(rp_{v,u} \wedge \neg dir_{t,v} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  \\
   
   $(lp_{v,u} \wedge dir_{t,v} \wedge used_{t,u}) \rightarrow up_{t,v,u}$ &
   $t \in T, v \in R, u \in PP(v), u \in V$
@@ -545,12 +560,18 @@ subtrees then they can not be mapped to the same node in network.
   $(lp_{v,u} \wedge dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
   $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
   \\
+ 
+  $(lp_{v,u} \wedge dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  \\
   
   $(rp_{v,u} \wedge \neg dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
   $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
   \\
   
-  maybe from $v$ to $u$ too ?? & \\
+  $(rp_{v,u} \wedge \neg dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  \\
   
   \hline
   $(\neg dir_{t,v} \wedge lp_{v,u}) \rightarrow \neg used_{t,u}$ &
@@ -611,10 +632,11 @@ on the same test cases.
 tests. From these 28 test cases PIRN$_C$ was able to solve only 21 and in all of them hybridisation number was less than 6. 
 On all the tests running time of PIRN$_C$ was worse than running time of our algorithm.
 Even PIRN$_{CH}$ did not solve 2 of these 28 tests in time and its running time was better than running time of our algorithm only
-on 5 tests and significantly worse on 2 tests. 12 more test cases were not solved by PIRN$_C$ and our algorithm did not find an optimal network for them, but was able to produce non-optimal network. PIRN$_{CH}$ did not solve 3 of these cases in time, produced less optimal 
-network on 1 test case and produced more optimal network on 2 test cases. It appeared that in 2 of these test cases both our algorithm 
-and PIRN$_{CH}$ found an optimal network, and on 1 only our algorithm produced optimal answer. 8 more test cases had equal trees in input, 
-so they had an obvious answer and we excluded them from consideration.
+on 5 tests and significantly worse on 2 tests. 12 more test cases were not solved by PIRN$_C$ and our algorithm did not complete computation 
+in time, but was able to produce some (possibly non-optimal) network. PIRN$_{CH}$ did not solve 3 of these 12 cases in time, in 3 cases 
+produced less optimal network than our algorithm, in 2 cases more optimal and in the rest 4 cases results were equal. From these 12 cases PIRN$_{CH}$
+produced an optimal network for only 2, and our algorithm found an optimal network for 4 cases but was unable to prove their optimality. 
+8 more test cases had equal trees in input, so they had an obvious answer and we excluded them from consideration.
 
 Experiments showed that sometimes our algorithm is able to find an optimal network but then it spends a bunch of time trying to find network 
 with hybridisation number one less than optimal and that time is higher than reasonable limit. Sometimes we can avoid such behaviour by 
@@ -624,7 +646,9 @@ Thus upper bounds on hybridisation number will also be very useful and will save
 
 \section{Discussion}
 
-We proposed an algorithm for construction an exact parsimonious hybridisation network from multiply trees. Experiments show that our method outperform PIRN$_{CH}$ algorithm in all cases and perform reasonably well comparing to heuristic PIRN$_C$. However in cases of high hybridisatrion numbers search and construction of optimal network  is still very challenging problem. In future we plan to use existing 
+We proposed an algorithm for construction an exact parsimonious hybridisation network from multiply trees. Experiments show that our method 
+outperforms PIRN$_{CH}$ algorithm in all cases and perform reasonably well comparing to heuristic PIRN$_C$. However in cases of high 
+hybridisation numbers search and construction of optimal network  is still very challenging problem. In future we plan to use existing 
 heuristics and estimations on lower and upper bounds on hybridisation number to limit searching bounds and reduce running time of our algorithm.
 
 \section*{Acknowledgements}

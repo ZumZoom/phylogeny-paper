@@ -1,0 +1,21 @@
+graph G {
+  node [shape=circle width=0.3 fixedsize=true height=0.3];
+  {rank = same; a b c d e};
+  node [shape = square label = "" width=0.15 fixedsize=true height=0.15];
+  _11 _12;
+  node [shape = point width=default height=default];
+  _5 -- _12;
+  _5 -- _11;
+  _6 -- b;
+  _6 -- _11;
+  _7 -- a;
+  _7 -- _6;
+  _8 -- c;
+  _8 -- _7;
+  _9 -- _8;
+  _9 -- _5;
+  _10 -- _12;
+  _10 -- _9;
+  _11 -- d;
+  _12 -- e;
+}

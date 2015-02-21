@@ -1,0 +1,10 @@
+graph G {
+  node [shape=circle width=0.3 fixedsize=true height=0.3];
+  edge [arrowType=none];
+  {rank = same; a b c d e};
+  node [shape=point width=default height=default];
+  1 -- {a, b};
+  2 -- {1, c};
+  3 -- {2, d};
+  4 -- {3, e};
+}
