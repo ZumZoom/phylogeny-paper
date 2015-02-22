@@ -7,7 +7,6 @@
 \usepackage{enumerate}
 \usepackage{textcomp}         
 \usepackage{verbatim}
-%\usepackage{subfig}
 \usepackage[caption=false]{subfig}
 
 \begin{document}
@@ -40,11 +39,11 @@ nodes (called reticulation nodes) with more than one incoming edge. Phylogenetic
 networks have been studied by several (?) researchers \cite{huson2010phylogenetic}, \cite{morrison2011introduction}, 
 \cite{nakhleh2011evolutionary}. There are several formulations of phylogenetic network
 construction problem with various modelling assumptions and different types of input data. 
-In this paper we focus on the specific type of phylogenetic network called hybridization
-network \cite{semple2006hybridization}, \cite{chen2010hybridnet}.
+In this paper we focus on the specific type of phylogenetic networks called hybridization
+networks \cite{semple2006hybridization}, \cite{chen2010hybridnet}.
 
 As an input data for hybridization network construction we consider a set of gene trees. 
-All the gene trees have the same set of leaves
+All the gene trees have the same set of leaves.
 Each gene tree models the evolutionary history of some gene. 
 Because of the reticulate evolutionary events these trees can have different topologies.
 The aim is to construct a hybridization network containing the smallest possible number of 
@@ -76,38 +75,40 @@ construction process and section 4 gives the experimental results.
 
 \section{Definitions and Background}
 
-We define a "phylogenetic tree" as a leaf-labelled tree constructed over a set of taxa. 
+We define a \emph{phylogenetic tree} as a leaf-labelled tree constructed over a set of taxa. 
 Throughout this paper we assume that trees are rooted and binary, i.e. in-degrees of all nodes, except root, are one, 
-and out-degrees are zero for leaves and two for internal nodes. A "hybridisation network" is a directed acyclic graph 
+and out-degrees are zero for leaves and two for internal nodes. 
+
+A \emph{hybridisation network} is a directed acyclic graph 
 with a single root and leaves bijectively labelled by the set of taxa. If the in-degree of a node is greater than one, 
-such node is called hybridisation node. In this paper we assume that hybridisation nodes have in-degree of two and 
-out-degree of one. We can do this assumption by noting that we can convert a hybridisation node with in-degree 
-of three or more to the sequence of hybridisation nodes of in-degree two \cite{wu2010close}. Other nodes are regular 
+such node is called \emph{reticulation node}. In this paper we assume that reticulation nodes have in-degree of two and 
+out-degree of one. We can do this assumption by noting that we can convert a reticulation node with in-degree 
+of three or more to the sequence of reticulation nodes of in-degree two \cite{wu2010close}. Other nodes are regular 
 tree nodes and have the same properties as in tree.
 
-Consider a hybridisation network $N$. Firstly we keep only one of the incoming edges for each hybridisation node in $N$. 
+Consider the hybridisation network $N$. Firstly we keep only one of the incoming edges for each reticulation node in $N$. 
 Secondly we contract edges to remove all the nodes of in-degree one and out-degree one. With this two steps we obtain a 
 tree $T'$ from the network $N$.
 
 Now suppose we have a phylogenetic tree $T$ and a hybridisation network $N$. We say that network $N$ \emph{displays} $T$ 
-if we can choose the edges of hybridisation nodes in such a way that after edge-contraction obtained tree $T'$ will be 
+if we can choose the edges of reticulation nodes in such a way that after edge-contraction obtained tree $T'$ will be 
 equivalent to $T$.
 
-A "hybridisation number" is commonly defined as the sum of in-degrees of all edges minus one. Note that under our 
+A \emph{hybridisation number} is commonly defined as the sum of in-degrees of all edges minus one. Note that under our 
 assumptions $h(N)$ simply equals the number of reticulation nodes.
 
 $h(N) = \sum\limits_{v != root} (d^-(v) - 1)$
 
-Suppose we are given a set of $K$ phylogenetic trees $T_1, T_2, ... T_k$ over the same set of taxa. The minimum 
-hybridisation network for that set of trees is a network $N_{min}$ that displays each tree and has the lowest 
+Suppose we are given a set of $K$ phylogenetic trees $T_1, T_2, ... T_k$ over the same set of taxa. The \emph{minimum 
+hybridisation network} for that set of trees is a network $N_{min}$ that displays each tree and has the lowest 
 hybridisation number possible.
 
-The most parsimonious hybridisation network problem.
+The most parsimonious hybridisation network problem is the following:
 
-Given a set of $K$ phylogenetic trees $T_1, T_2, ... T_k$ over the same set of taxa, construct the minimum hybridisation 
+Given a set of phylogenetic trees $T_1, T_2, ... T_k$ over the same set of taxa, construct the minimum hybridisation 
 network for that set of trees.
 
-It has been shown that even for the case of $K=2$ construction of such a network is NP-complete problem 
+It has been shown that even for the case of $k=2$ construction of such a network is NP-complete problem 
 \cite {bordewich2007computing}. As far as we know there exists only one algorithm for the construction of the most 
 parsimonious hybridisation network \cite {wu2013algorithm}.
 
@@ -117,21 +118,21 @@ parsimonious hybridisation network \cite {wu2013algorithm}.
   \includegraphics[width=1in]{pics/inp2.eps}
   \includegraphics[width=1in]{pics/inp3.eps}
   \includegraphics[width=1.2in]{pics/ans.eps}
-  \caption{An illustration of a hybridisation network for three trees with two hybridisation nodes.}
+  \caption{An illustration of a hybridisation network for three trees with two reticulation nodes.}
   \label{dfa-example}
 \end{figure}
 
 \section{Algorithm}
 
-The main idea of the algorithm is to look over possible values if hybridisation number and to construct a boolean 
-formula that represent a hybridisation network with fixed hybridisation number. Before doing this search we do some 
+The main idea of the algorithm is to look over possible values of hybridisation number and to construct and solve a boolean 
+formula that represents a hybridisation network with fixed hybridisation number. Before doing this search we do some 
 pre-processing and consequently some post-processing after the network is found.
 
 \subsection{Pre-processing}
 
 Before the actual boolean formula encoding we modify the input and split it into several tasks to reduce the size 
 and complexity of the problem. We do this according to the rules from \cite {bonet2009efficiently}. To define those 
-rules we first need to define the term "cluster". A set of taxa $A$ is a cluster in trees $T_1, T_2, ... T_k$ if there 
+rules we first need to define the term \emph{cluster}. A set of taxa $A$ is a cluster in trees $T_1, T_2, ... T_k$ if there 
 exists a node in each tree that has all the taxa from $A$ in its descendants.
 
 \begin{enumerate}
@@ -166,21 +167,21 @@ tried to satisfy formulas with values of $k$ less than $k_{optimal}$ its results
 an observation that it is much easier for solver to produce an answer if formula is satisfiable than if it is not. In case 
 of unsatisfiable formula solver should check every possible answer to ensure that there is no solution. Obvious method 
 for reducing searching time is to use different heuristics for finding close starting upper and lower bounds of 
-hybridisation number. Possible candidates are PIRN$_{CH}$, RIATA-HGT and MURPAR. We do not consider this optimisations in this paper.
+hybridisation number. Possible candidates are PIRN$_{CH}$, RIATA-HGT and MURPAR. We do not consider such optimisations in this paper.
 
 \subsection{Encoding boolean formula}
 
 Having a set of trees $T$ over a set of taxa $N$ and fixed hybridisation number $k$ we will construct boolean formula 
 that will be satisfiable iff there exists a hybridisation network that displays each tree in $T$ and its hybridisation 
 number equals to $k$. To do this we first notice that a network over the set of taxa of size $n$ with hybridisation number 
-$k$ will have $2 * (n + k) - 1$ nodes (?? why ??). As we add dummy root and dummy leaf, we finally have $2 * (n + k) + 1$ nodes, 
-$k$ of which are hybridisation nodes, $n + 1$ are leaves and others are usual tree nodes. We numerate all the nodes in such a way 
-that all leaves have numbers in range $[0,n]$, all regular nodes have numbers in range $[n + 1,2n + k]$ and all hybridisation nodes have numbers 
-in range $[2n + k + 1, 2(n + k)]$. And we assume that the number of any leave or regular node is less than number of its parent. This is done to 
+$k$ will have $2 * (n + k) - 1$ nodes. As we add dummy root and dummy leaf, we finally have $2 * (n + k) + 1$ nodes, 
+$k$ of which are reticulation nodes, $n + 1$ are leaves and others are usual tree nodes. We numerate all the nodes in such a way 
+that all leaves have numbers in range $[0,n]$, all regular nodes have numbers in range $[n + 1,2n + k]$ and all reticulation nodes have numbers 
+in range $[2n + k + 1, 2(n + k)]$. We also assume that the number of any leave or regular node is less than number of its parent. This is done to 
 avoid consideration of isomoprhic networks during SAT solving. Such numeration allows us to define the following sets of nodes for each node 
 $v$: $PC(v)$ is the set of possible children of $v$, $PP(v)$ is the set of possible parents of $v$ and $PU(v)$ is the set of nodes that can 
-be indirect parents of $v$. Also let $R$ be the set of hybridisation nodes, $L$ be the set of leaves and $V$ be the set of regular nodes. 
-Now we will describe literals and clauses required to construct boolean formula in conjunctive normal form.
+be indirect parents of $v$. Also let $R$ be the set of reticulation nodes, $L$ be the set of leaves and $V$ be the set of regular nodes. 
+Now we will describe literals and clauses required to construct boolean formula.
 
 \subsubsection{Network structure encoding} 
 
@@ -198,11 +199,11 @@ $p$ is true iff $u$ is parent of regular node $v$.
 
 \item $\forall v \in R, u \in PP(v) : lp_{v,u}(rp_{v,u})$ 
 
-$lp (rp)$ is true iff $u$ is left (right) parent of hybridisation node $v$.
+$lp (rp)$ is true iff $u$ is left (right) parent of reticulation node $v$.
 
 \item $\forall v \in R, u \in PC(v) : ch_{v,u}$ 
 
-$ch$ is true iff $u$ is child of hybridisation node $v$.
+$ch$ is true iff $u$ is child of reticulation node $v$.
 
 \end{enumerate}
 
@@ -214,12 +215,12 @@ in the following way (for example for parents of regular node $v$):
 
 $(\bigvee\limits_{u \in PP(v)} p_{v,u}) \wedge (\bigwedge\limits_{i, j \in PP(v);i < j} (p_{v,i} \rightarrow \neg p_{v,j}))$.
 
-Using this pattern we add uniqueness constraints for literals $l$, $r$, $p$, $lp$, $rp$, $ch$. We also add constraints to order numbers of children of regular nodes and parents of hybridisation nodes.
+Using this pattern we add uniqueness constraints for literals $l$, $r$, $p$, $lp$, $rp$, $ch$. We also add constraints to order numbers of children of regular nodes and parents of reticulation nodes.
 
 Network will be consistent if for every pair of nodes parent relation implies child relaton and vice versa. So we add constraints that connect parent literals with children literals for all the types of nodes.
 
-And the last step in network construction is to care about numeration around hybridisation nodes. To do this we add constraints to fix 
-relative numbers of children and parents of hybridisation nodes. 
+And the last step in network construction is to care about numeration around reticulation nodes. To do this we add constraints to fix 
+relative numbers of children and parents of reticulation nodes. 
 
 The proposed constraints are listed in Table~\ref{network-table}. Thus as we need $O(n^2)$ clauses for each node to represent uniquness of 
 its parents and children and $O(n)$ clauses for each node to represent parents-children relation, we finally get $O(n^3)$ clauses in total 
@@ -353,12 +354,12 @@ mapping of network nodes to tree nodes
 
 \item $\forall t \in T, v \in R : dir_{t,v}$
 
-$dir$ is true iff left parent edge of hybridisation node $v$ is used to display tree $t$ and it is false in case 
+$dir$ is true iff left parent edge of reticulation node $v$ is used to display tree $t$ and it is false in case 
 of right edge, i.e. it specifies direction of necessary parent to display current tree
 
 \item $\forall t \in T, v \in R : rused_{t,v}$
 
-$rused$ is true iff child of hybridisation node $v$ is used to display tree $t$
+$rused$ is true iff child of reticulation node $v$ is used to display tree $t$
 
 \item $\forall t \in T, v \in V : used_{t,v}$
 
@@ -376,7 +377,7 @@ $v$ in $t$.
 
 Note that leaves of the trees are bijectively mapped to leaves of the network thus there is no need to introduce $x$ variables for them. 
 
-Thus we have extra $O(t n^2)$ literals to match input trees to the network.
+Thus we have extra $O(t n^2)$ literals to match input trees to the network. So we have $O(tn^2)$ literals in total.
 
 We specify constraints for relations between network nodes and tree nodes. 
 First of all we define at-least-one and at-most-one constraints for literals $x$ and $up$. Note that in case 
@@ -407,23 +408,23 @@ $(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$
 
 $(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$
 
-We also add clauses to forbid incorrect numeration, if node $v$ has hybridisation parent $u$ then there can not 
+We also add clauses to forbid incorrect numeration, if node $v$ has reticulation parent $u$ then there can not 
 exist node $w$ that its number is less than number of $v$ and $up_{t,u,w}$ is true. And for all $w$ with numbers 
 greater than $v$ we add clauses to share information of $up$ variables, we do this the same way as in previous observation.
 
-Before adding similar constraints for child-parent relations of hybridisation nodes we add some restrinctions on
-$rused$ literals. First of all if for any hybridisation node $v$ its child is regular node we should use $v$ for 
-displaying tree. If its child is hybridisation node then we shouldn't use node $v$ unless its child is used. We 
+Before adding similar constraints for child-parent relations of reticulation nodes we add some restrinctions on
+$rused$ literals. First of all if for any reticulation node $v$ its child is regular node we should use $v$ for 
+displaying tree. If its child is reticulation node then we shouldn't use node $v$ unless its child is used. We 
 also should forbid usage of node $v$ when its direction as parent of $u$ differs from direction specified in 
 $u$, and we should use node $v$ if its direction matches direction specified in $u$ and $u$ itself is used.
 
-Now we consider hybridisation node $v$ and its parent $u$. If $u$ is hybridisation node then we should share information 
+Now we consider reticulation node $v$ and its parent $u$. If $u$ is reticulation node then we should share information 
 about their parent considreing tree $t$ but only when direction of parent $u$ matches direction specified in $v$. 
 If $u$ is regular node and $u$ is used for displaying then $u$ is direct parent of $v$ considering tree $t$.
 On the other hand if $u$ is not used then we should share information about their parent considering tree $t$ also 
 only when direction of $u$ matches direction specified in $v$.
 
-Next step is forbidding some meaningless values of $used$ literals. Consider hybridisation node $v$ and one of its parents $u$. 
+Next step is forbidding some meaningless values of $used$ literals. Consider reticulation node $v$ and one of its parents $u$. 
 $u$ can not be used for displlaying current tree if its direction differs from direction specified in $v$ or if $v$ is 
 not used for displaying itself.
 
@@ -431,6 +432,9 @@ We finish tree mapping by adding heuristic constraints. Notice that number of no
 size of the sub-tree of corresponding node $tv$ in tree $t$ and also it can not be greater than size of the tree minus 
 depth of $tv$. Also if node $tv_1$ in tree $t_1$ and node $tv_2$ in tree $t_2$ have disjoint sets of taxa in their 
 subtrees then they can not be mapped to the same node in network.
+
+Again the most expensive clauses are clauses that represent uniquness of variables $up$ and $x$. We have $O(n^2)$ clauses for
+each node for each tree, so we have $O(tn^3)$ clauses to map trees to the network. This sums up to $O(tn^3)$ clauses in total.
 
 \begin{table}
 \centering
