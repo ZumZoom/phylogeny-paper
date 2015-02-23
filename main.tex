@@ -25,7 +25,11 @@
 \setcounter{footnote}{0}
 
 \begin{abstract}
-  TODO: abstract
+  We present an algorithm for the minimum hybridisation network construction problem that is based on reducing 
+  the problem to an instance of boolean satisfiability problem. We created a software tool called PhyloSAT  
+  that implements our algorithm and is available for download from \url{https://github.com/ZumZoom/PhyloSAT}.
+  Experimental evaluation of our algorithm on biological data shows that our method is as far as we know the 
+  fastest exact algorithm for the minimum hybridisation network construction.
 
   \keywords{Hybridisation networks, Boolean satisfiability, TODO}
 \end{abstract}
@@ -43,7 +47,7 @@ In this paper we focus on the specific type of phylogenetic networks called hybr
 networks \cite{semple2006hybridization}, \cite{chen2010hybridnet}.
 
 As an input data for hybridization network construction we consider a set of gene trees. 
-All the gene trees have the same set of leaves.
+All the gene trees have the same set of leaves called taxa.
 Each gene tree models the evolutionary history of some gene. 
 Because of the reticulate evolutionary events these trees can have different topologies.
 The aim is to construct a hybridization network containing the smallest possible number of 
@@ -53,7 +57,7 @@ Most of the algorithms for hybridization network construction are heuristic \cit
 and they usually deal with only two trees.
 However, recently an exact algorithm PIRN$_C$ has been introduced \cite{wu2013algorithm} which is able to process more than two input trees.
 
-In this paper we introduce a new approach for parsimonious
+In this paper we introduce a new approach for exact parsimonious
 hybridization network construction from multiply input trees based on satisfiability (SAT) solvers.
 %SAT-solver is a software package designed to solve SAT problem, which consists of finding a satisfying assignment for a boolean formula. 
 SAT problem is known to be NP-complete \cite{bordewich2007computing}, but state-of-the-art SAT-solvers running on the modern hardware 
@@ -112,11 +116,14 @@ It has been shown that even for the case of $k=2$ construction of such a network
 \cite {bordewich2007computing}. As far as we know there exists only one algorithm for the construction of the most 
 parsimonious hybridisation network \cite {wu2013algorithm}.
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \includegraphics[width=1in]{pics/inp1.eps}
+  ~
   \includegraphics[width=1in]{pics/inp2.eps}
+  ~
   \includegraphics[width=1in]{pics/inp3.eps}
+  ~~~
   \includegraphics[width=1.2in]{pics/ans.eps}
   \caption{An illustration of a hybridisation network for three trees with two reticulation nodes.}
   \label{dfa-example}
@@ -439,7 +446,7 @@ each node for each tree, so we have $O(tn^3)$ clauses to map trees to the networ
 \begin{table}
 \centering
 \caption{Clauses to map trees to network}
-\scalebox{1}{
+\scalebox{0.9}{
 \begin{tabular}{l | l}
   Clauses & Range \\
   
