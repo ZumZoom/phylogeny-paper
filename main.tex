@@ -363,7 +363,7 @@ to represent the network structure.
 \label{network-table}
 \end{table}
 
-\subsubsection{Mapping trees to the network}
+\subsubsection{Mapping trees to the network.}
 
 To express that network contains all the input trees we add literals that represent mapping of tree nodes to 
 the network nodes:
@@ -415,7 +415,7 @@ and $tu$ is parent of $tv$ then $u$ is direct parent of $v$ considering tree $t$
 that $v$ corresponds to $tv$ and we know that $u$ is direct parent of $v$ considering tree $t$, then $u$ should 
 correspond to parent of $tv$. We also should take care about numeration so we add constraint that says that if node 
 $v$ has greater number than node $u$ then their corresponding nodes from tree can not have reversed order of 
-numbers, i.e. $tu > tv : x_{t,tv,v} \rightarrow \neg x_{t,tu,u}$.
+numbers, i.e. $x_{t,tv,v} \rightarrow \neg x_{t,tu,u}$ for each $tu$ and $tv$ such that $tu > tv$.
 
 Next we add constraints that connect child-parent relations from trees with indirect child-parent relations in 
 the network. First of all if $u$ is a direct parent of node $v$ and $u$ is used to display tree $t$ then $u$ is 
