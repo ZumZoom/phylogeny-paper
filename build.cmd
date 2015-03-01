@@ -1,3 +1,6 @@
+cd pics
+./build.sh
+cd ..
 latex main
 bibtex main
 latex main
