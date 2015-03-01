@@ -27,8 +27,9 @@
 
 \begin{abstract}
   We present an algorithm for the minimal hybridization network construction problem which is based on reducing 
-  the problem to an instance of the Boolean satisfiability problem. We created a software tool called PhyloSAT  
-  which implements our algorithm and is available for download from \url{https://github.com/ZumZoom/PhyloSAT}.
+  the problem to an instance of the Boolean satisfiability problem. The main idea of our algorithm is to look over
+  possible hybridosation numbers and to constrcut for each of them a Boolean formula that is satisfiable iff there
+  exists a network with such hybridisation number. We also created a software tool called PhyloSAT which implements our algorithm.
   The experimental evaluation of our algorithm on biological data shows that our method is as far as we know the 
   fastest exact algorithm for the minimal hybridization network construction problem.
 
@@ -60,7 +61,7 @@ However, the exact algorithm PIRN$_\mathrm{C}$ has been introduced recently \cit
 
 In this paper we introduce a new approach for exact parsimonious
 hybridization network construction from multiple input trees based on satisfiability (SAT) solvers.
-%SAT-solver is a software package designed to solve SAT problem, which consists of finding a satisfying assignment for a boolean formula. 
+%SAT-solver is a software package designed to solve SAT problem, which consists of finding a satisfying assignment for a Boolean formula. 
 The SAT problem is known to be NP-complete \cite{bordewich2007computing}, but state-of-the-art SAT-solvers running on modern hardware 
 are able to solve SAT instances having tens of thousands of variables and hundreds of thousands of clauses in several minutes.
 
@@ -98,7 +99,7 @@ Now suppose we have a phylogenetic tree $T$ and a hybridization network $N$. We 
 if we can choose the edges of reticulation nodes in such a way that after edge-contraction the obtained tree $T'$ will be 
 isomorphic to $T$. In Figure~\ref{network-example} each of the three trees is displayed in the hybridisation network.
 
-A \emph{hybridization number} of network $N$ with root $\rho$ is commonly defined as $h(N) = \sum\limits_{v != \rho} (d^-(v) - 1)$.
+A \emph{hybridization number} of network $N$ with root $\rho$ is commonly defined as $h(N) = \sum\limits_{v \ne \rho} (d^-(v) - 1)$.
 Note that under our assumptions $h(N)$ simply equals the number of reticulation nodes.
 
 Suppose we are given a set of $K$ phylogenetic trees $T_1, T_2, ... T_k$ over the same set of taxa. The \emph{minimal 
@@ -121,12 +122,12 @@ parsimonious hybridization network \cite {wu2013algorithm}.
     \includegraphics[width=1in]{pics/inp2.eps}
     ~~
     \includegraphics[width=1in]{pics/inp3.eps}
-    \centering{\\ (a) Three gene trees}
+    \centering{\\ (a) Three gene trees over the set of taxa \\ \{a, b, c, d, e\}}
   \end{minipage}
   \hfill
   \begin{minipage}[b]{0.40\linewidth}
-    \includegraphics[width=1.1in]{pics/ans.eps}
-    \centering{\\ (b) Hybridisation network for the trees from Fig.~\ref{network-example}~(a)}
+    \includegraphics[width=1.3in]{pics/ans.eps}
+    \centering{\\ (b) A hybridisation network for the trees from Fig.~\ref{network-example}~(a)}
   \end{minipage}
   \caption{An illustration of a hybridization network for three trees with two reticulation nodes. Reticulation nodes are shown as boxes.}
   \label{network-example}
@@ -134,12 +135,12 @@ parsimonious hybridization network \cite {wu2013algorithm}.
 
 \section{Algorithm}
 
-The main idea of the algorithm is to look over possible values of the hybridization number and to construct and solve a boolean 
+The main idea of the algorithm is to look over possible values of the hybridization number and to construct and solve a Boolean 
 formula that represents a hybridization network with this hybridization number.
 
 \subsection{Pre-processing}
 
-Before the actual boolean formula encoding we modify the input and split it into several tasks to reduce the size 
+Before the actual Boolean formula encoding we modify the input and split it into several tasks to reduce the size 
 and the complexity of the problem. We do this according to the rules from \cite {bonet2009efficiently}. To define these 
 rules we first need to define the term \emph{cluster}: a set of taxa $A$ is a cluster in trees $T_1, T_2, ... T_k$ if there 
 exists a node in each tree with the set of leaves of its subtree equal to the set $A$. The reduction rules are as follows:
@@ -179,8 +180,8 @@ separately and then their results will be merged at the post-processing stage.
 \subsection{Search of the minimal hybridization number}
 
 To solve a subtask we need to find the lowest hybridization number $k$ such that there exists a hybridization 
-network with this hybridization number. We look through possible values of $k$ starting from the highest (?? why do 
-we choose max $k$ equals to the size of taxa ??) and construct a boolean formula corresponding to the current $k$. 
+network with this hybridization number. We look through possible values of $k$ starting from the highest 
+and construct a Boolean formula corresponding to the current $k$. 
 We decrease $k$ until the solver can't satisfy the formula, and this means that the previous value of $k$ was the 
 lowest possible. There are another strategies of searching the minimal value of $k$. For example we can start from 
 zero and increase the value of $k$ until the solver will be able to satisfy the formula, or we can use binary search. 
@@ -193,18 +194,18 @@ formula is satisfiable. Because of this the results of the upwards search were v
 for reducing the search time is to limit the range of possible values of $k$ by using different heuristics to find close upper and lower bounds for $k$. 
 Possible candidates are PIRN$\mathrm{_{CH}}$ \cite{wu2013algorithm}, RIATA-HGT \cite{nakhleh2005riata} and MURPAR \cite{park2012murpar}. We do not consider such optimisations in this paper.
 
-\subsection{Encoding the boolean formula}
+\subsection{Encoding the Boolean formula}
 
-Having a set of trees $T$ over a set of taxa $N$ and a fixed hybridization number $k$, we will construct the boolean formula 
+Having a set of trees $T$ over a set of taxa $N$ and a fixed hybridization number $k$, we will construct the Boolean formula 
 which is satisfiable iff there exists a hybridization network that displays each tree in $T$ and its hybridization 
 number equals to $k$. To do this we first notice that a network over the set of taxa of size $n$ with hybridization number 
-$k$ will have $2 * (n + k) - 1$ nodes. As we add a dummy root and a dummy leaf, we finally have $2 * (n + k) + 1$ nodes, 
+$k$ will have $2 (n + k) - 1$ nodes. As we add a dummy root and a dummy leaf, we finally have $2 (n + k) + 1$ nodes, 
 $k$ of which are reticulation nodes, $n + 1$ are leaves and others are usual tree nodes. We numerate all the nodes in such a way 
 that leaves are numbered in range $[0,n]$, regular nodes have numbers in range $[n + 1,2n + k]$ and all reticulation nodes have numbers 
 in range $[2n + k + 1, 2(n + k)]$. We also assume that the number of any leaf or regular node is less than the number of its parent. This is done to 
 avoid consideration of isomorphic networks during SAT solving. Such numeration allows us to define the following sets of nodes for each node 
 $v$ such that $PC(v)$ is the set of possible children of $v$, $PP(v)$ is the set of possible parents of $v$ and $PU(v)$ is the set of possible ancestors of $v$. Also let $R$ be the set of reticulation nodes, $L$ be the set of leaves and $V$ be the set of regular nodes. 
-Now we will describe literals and clauses required to construct the boolean formula.
+Now we will describe literals and clauses required to construct the Boolean formula.
 
 \subsubsection{Network structure encoding.} 
 
@@ -212,430 +213,511 @@ First of all we encode the structure of the network. We introduce the following 
 
 \begin{enumerate}
 
-\item $l_{v,u}$ and $r_{v,u}$ for each $v \in V, u \in PC(v)$ 
-
+\item $l_{v,u}$ and $r_{v,u}$ for each $v \in V, u \in PC(v)$ : 
 $l_{v,u}$ (or $r_{v,u}$) is true iff regular node $v$ has node $u$ as its left (right) child.
 
-\item $p_{v,u}$  for each $v \in L \cup V / root, u \in PP(v)$
-
+\item $p_{v,u}$  for each $v \in L \cup V / root, u \in PP(v)$ :
 $p_{v,u}$ is true iff $u$ is the parent of a regular node $v$.
 
-\item $lp_{v,u}$ and $rp_{v,u}$ for each $v \in R, u \in PP(v)$
+\item $p^l_{v,u}$ and $p^r_{v,u}$ for each $v \in R, u \in PP(v)$ :
+$p^l_{v,u}$ (or $p^r_{v,u}$) is true iff $u$ is the left (right) parent of a reticulation node $v$.
 
-$lp_{v,u}$ (or $rp_{v,u}$) is true iff $u$ is the left (right) parent of a reticulation node $v$.
-
-\item $ch_{v,u}$ for each $v \in R, u \in PC(v)$
-
-$ch_{v,u}$ is true iff $u$ is a child of a reticulation node $v$.
+\item $c_{v,u}$ for each $v \in R, u \in PC(v)$ :
+$c_{v,u}$ is true iff $u$ is a child of a reticulation node $v$.
 
 \end{enumerate}
 
 This takes $O((n + k)^2)$ literals for specifying the network structure, and by noticing that $k < n$ we have $O(n^2)$ literals.
 
 To encode the uniqueness of parents and children we use an obvious pattern that requires $O(n^2)$ clauses for each node. We say 
-that the node can have at least one parent and at most one parent. This can be expressed 
-in the following way (for example for parents of regular node $v$): 
+that the node can have at least one parent and at most one parent. For example for parents of regular node $v$ this can be expressed 
+in the following way: 
+$$\left(\bigvee\limits_{u \in PP(v)} p_{v,u}\right) \wedge \left(\bigwedge\limits_{i, j \in PP(v);i < j} \left(p_{v,i} \rightarrow \neg p_{v,j}\right)\right).$$
 
-$$\left(\bigvee\limits_{u \in PP(v)} p_{v,u}\right) \wedge \left(\bigwedge\limits_{i, j \in PP(v);i < j} \left(p_{v,i} \rightarrow \neg p_{v,j}\right)\right)$$
+Using this pattern, we add the uniqueness constraints for literals $l$, $r$, $p$, $p^l$, $p^r$ and $c$. 
+These clauses are defined in sections 1 - 4 of Table~\ref{network-table}. 
+We also add constraints to order the numbers of children of regular nodes and parents of reticulation nodes.
+They are listed in the Section 5 of Table~\ref{network-table}.
 
-Using this pattern, we add the uniqueness constraints for literals $l$, $r$, $p$, $lp$, $rp$ and $ch$. We also add constraints to order the numbers of children of regular nodes and parents of reticulation nodes.
-
-Network is consistent if for every pair of nodes the parent relation implies the child relation and vice versa. Thus we add constraints that connect parent literals with children literals for all the types of nodes.
-
-The last step of network construction is to deal with the numeration around reticulation nodes. To do this, we add constraints to fix 
-relative numbers of children and parents of reticulation nodes. 
-
-The proposed constraints are listed in Table~\ref{network-table}. Since as we need $O(n^2)$ clauses for each node to represent the uniqueness of 
-its parents and children and $O(n)$ clauses for each node to represent the parents-children relation, we finally get $O(n^3)$ clauses in total 
-to represent the network structure.
-
-\begin{table}
+\begin{table}[t]
 \centering
-\caption{Clauses for network structure encoding}
-\scalebox{1.1}{
-\begin{tabular}{l | l}
-  Clauses & Range \\
+\caption{Clauses for network structure encoding.}
+\begin{tabular}{l | l | l}
+  Number & Clause & Range \\
   
   \hline
+  1.1 &
   $p_{v,u_1} \vee ... \vee p_{v,u_k}$ &
   $v \in V, u_1 ... u_k \in PP(v)$
   \\
+  1.2 &
   $p_{v,u} \rightarrow \neg p_{v,w}$ &
   $v \in V, u, w \in PP(v)$
   \\
   
   \hline
+  2.1 &
   $l_{v,u_1} \vee ... \vee l_{v,u_k}$ &
   $v \in V, u_1 ... u_k \in PC(v)$
   \\
+  2.2 &
   $l_{v,u} \rightarrow \neg l_{v,w}$ &
   $v \in V, u, w \in PC(v)$
   \\
+  2.3 &
   $r_{v,u_1} \vee ... \vee r_{v,u_k}$ &
   $v \in V, u_1 ... u_k \in PC(v)$
   \\
+  2.4 &
   $r_{v,u} \rightarrow \neg r_{v,w}$ &
   $v \in V, u, w \in PC(v)$
   \\
-  $l_{v,u} \rightarrow \neg r_{v,w}$ &
-  $v \in V, u, w \in PC(v): u \geq w$
-  \\
   
   \hline
-  $ch_{v,u_1} \vee ... \vee ch_{v,u_k}$ &
+  3.1 &
+  $c_{v,u_1} \vee ... \vee c_{v,u_k}$ &
   $v \in R, u_1 ... u_k \in PC(v)$
   \\
-  $ch_{v,u} \rightarrow \neg ch_{v,w}$ &
+  3.2 &
+  $c_{v,u} \rightarrow \neg c_{v,w}$ &
   $v \in R, u, w \in PC(v)$
   \\
   
   \hline
-  $lp_{v,u_1} \vee ... \vee lp_{v,u_k}$ &
+  4.1 &
+  $p^l_{v,u_1} \vee ... \vee p^l_{v,u_k}$ &
   $v \in R, u_1 ... u_k \in PP(v)$
   \\
-  $lp_{v,u} \rightarrow \neg lp_{v,w}$ &
+  4.2 &
+  $p^l_{v,u} \rightarrow \neg p^l_{v,w}$ &
   $v \in R, u, w \in PP(v)$
   \\
-  $rp_{v,u_1} \vee ... \vee rp_{v,u_k}$ &
+  4.3 &
+  $p^r_{v,u_1} \vee ... \vee p^r_{v,u_k}$ &
   $v \in R, u_1 ... u_k \in PP(v)$
   \\
-  $rp_{v,u} \rightarrow \neg rp_{v,w}$ &
+  4.4 &
+  $p^r_{v,u} \rightarrow \neg p^r_{v,w}$ &
   $v \in R, u, w \in PP(v)$
   \\
-  $lp_{v,u} \rightarrow \neg rp_{v,w}$ &
+
+  \hline
+  5.1 &
+  $l_{v,u} \rightarrow \neg r_{v,w}$ &
+  $v \in V, u, w \in PC(v): u \geq w$
+  \\
+  5.2 &
+  $p^l_{v,u} \rightarrow \neg p^r_{v,w}$ &
   $v \in R, u, w \in PP(v) : u \geq w$
   \\
   
   \hline
+  6.1 &
   $l_{v,u} \rightarrow p_{u,v}$ &
   $v \in V, u \in V, u \in PC(v)$
   \\
+  6.2 &
   $r_{v,u} \rightarrow p_{u,v}$ &
   $v \in V, u \in V, u \in PC(v)$
   \\
+  6.3 &
   $p_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
   $v \in V, u \in V, u \in PC(v)$
   \\
   
   \hline
-  $l_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$ &
+  7.1 &
+  $l_{v,u} \rightarrow (p^l_{u,v} \vee p^r_{u,v})$ &
   $v \in V, u \in R, u \in PC(v)$
   \\
-  $r_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$ &
+  7.2 &
+  $r_{v,u} \rightarrow (p^l_{u,v} \vee p^r_{u,v})$ &
   $v \in V, u \in R, u \in PC(v)$
   \\
-  $lp_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
+  7.3 &
+  $p^l_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
   $v \in V, u \in R, u \in PC(v)$
   \\
-  $rp_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
+  7.4 &
+  $p^r_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
   $v \in V, u \in R, u \in PC(v)$
   \\
   
   \hline 
-  $ch_{v,u} \rightarrow p_{u,v}$ &
+  8.1 &
+  $c_{v,u} \rightarrow p_{u,v}$ &
   $v \in R, u \in V, u \in PC(v)$
   \\
-  $p_{u,v} \rightarrow ch_{v,u}$ &
+  8.2 &
+  $p_{u,v} \rightarrow c_{v,u}$ &
   $v \in R, u \in V, u \in PC(v)$
   \\
   
   \hline
-  $ch_{v,u} \rightarrow (lp_{u,v} \vee rp_{u,v})$ &
+  9.1 &
+  $c_{v,u} \rightarrow (p^l_{u,v} \vee p^r_{u,v})$ &
   $v \in R, u \in R, u \in PC(v)$
   \\
-  $lp_{u,v} \rightarrow ch_{v,u}$ &
+  9.2 &
+  $p^l_{u,v} \rightarrow c_{v,u}$ &
   $v \in R, u \in R, u \in PC(v)$
   \\
-  $rp_{u,v} \rightarrow ch_{v,u}$ &
+  9.3 &
+  $p^r_{u,v} \rightarrow c_{v,u}$ &
   $v \in R, u \in R, u \in PC(v)$
   \\
   
   \hline
-  $ch_{v,u} \rightarrow \neg lp_{v,w}$ &
-  $v \in R, u \in PC(v), w \in PP(v): w \leq u$
+  10.1 &
+  $c_{v,u} \rightarrow \neg p^l_{v,w}$ &
+  $v \in R, u \in PC(v), w \in PP(v): u \geq w$
   \\
-  $ch_{v,u} \rightarrow \neg rp_{v,w}$ &
-  $v \in R, u \in PC(v), w \in PP(v): w \leq u$
+  10.2 &
+  $c_{v,u} \rightarrow \neg p^r_{v,w}$ &
+  $v \in R, u \in PC(v), w \in PP(v): u \geq w$
   \\
   
 \end{tabular}
-}
 \label{network-table}
 \end{table}
 
+Network is consistent if for every pair of nodes the parent relation implies the child relation and vice versa. Thus we add constraints that connect parent literals with children literals for all the types of nodes. See sections 6 - 9 of Table~\ref{network-table} for these clauses.
+The last step of network construction is to deal with the numeration around reticulation nodes. To do this, we add constraints to fix 
+relative numbers of children and parents of reticulation nodes. They are defined in the Section 10 of Table~\ref{network-table}.
+
+Since we need $O(n^2)$ clauses for each node to represent the uniqueness of its parents and children 
+and $O(n)$ clauses for each node to represent the parents-children relation, we finally get $O(n^3)$ clauses in total 
+to represent the network structure.
+
 \subsubsection{Mapping trees to the network.}
 
-To express that network contains all the input trees we add literals that represent mapping of tree nodes to 
+To express that the network contains all the input trees we add literals that represent the mapping of the tree nodes to 
 the network nodes:
 
 \begin{enumerate}
 
-\item $x_{t,s,v}$ for each $t \in T, s \in V(t), v \in V$
-
-$x_{t,s,v}$ is true iff regular node $v$ represents node $s$ from tree $t$, i.e. $x$ literals represent bijective 
-mapping of network nodes to tree nodes.
+\item $x_{t,v_t,v}$ for each $t \in T, v_t \in V(t), v \in V$ :
+$x_{t,s,v}$ is true iff regular node $v$ represents node $v_t$ from tree $t$, i.e. $x$ literals represent bijective 
+mapping of network nodes to tree nodes. An example of such mapping is illustrated in Figure~\ref{mapping-example}.
 Note that leaves of the trees are bijectively mapped to leaves of the network thus there is no need to introduce $x$ variables for them.
 
-\item $dir_{t,v}$ for each $t \in T, v \in R$
+\item $d_{t,v}$ for each $t \in T, v \in R$ :
+$d_{t,v}$ is true iff left parent edge of reticulation node $v$ is used to display tree $t$,
+ i.e. it specifies direction of necessary parent to display current tree
 
-$dir_{t,v}$ is true iff left parent edge of reticulation node $v$ is used to display tree $t$ and it is false in case 
-of right edge, i.e. it specifies direction of necessary parent to display current tree
+\item $u^r_{t,v}$ for each $t \in T, v \in R$ :
+$u^r_{t,v}$ is true iff child of reticulation node $v$ is used to display tree $t$
 
-\item $rused_{t,v}$ for each $t \in T, v \in R$
+\item $u_{t,v}$ for each $t \in T, v \in V$ :
+$u_{t,v}$ is true iff regular node $v$ is used to display tree $t$
 
-$rused_{t,v}$ is true iff child of reticulation node $v$ is used to display tree $t$
-
-\item $used_{t,v}$ for each $t \in T, v \in V$
-
-$used_{t,v}$ is true iff regular node $v$ is used to display tree $t$
-
-\item $up_{t,v,u}$ for each $t \in T, v \in V, u \in PU(v)$
-
-$up_{t,v,u}$ is true iff regular node $u$ corresponds to the first node on the path to the root of the tree $t$ starting 
-from $v$. Note that because of edge contraction node $v$ may not exist in tree $t$, but nevertheless it lies on 
-the some path in the network that after contraction will become an edge in tree $t$, so $u$ will correspond to 
-the end of that edge. We will still say that $u$ is parent of $v$ considering tree $t$ oblivious to the inexistence of
-$v$ in $t$.
+\item $a_{t,v,u}$ for each $t \in T, v \in V, u \in PU(v)$ :
+$a_{t,v,u}$ is true iff the regular node $u$ is an ancestor of node $v$ and node $u$ corresponds to such node $u_t$ 
+from the tree $t$ that all the edges on the path from $u$ to $v$ are contracted to a single edge of tree $t$. I.e. node
+$u$ is the first node on the path from $v$ to root that is bijectively mapped to some node in the tree $t$.
+We will say that the node $u$ is the direct parent of the node $v$ considering tree $t$. Note that the node $v$ is not necessary present in tree $t$.
+In Figure~\ref{mapping-example} node $u$ is the parent of all the nodes starting from the node $v$ considering tree $t$.
 
 \end{enumerate}
 
-We have extra $O(t n^2)$ literals to match input trees to the network. Hence, we have $O(tn^2)$ literals in total.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=1.3in]{pics/up_var.eps}
+  \caption{An illustration of a piece of mapping of the nodes from the tree (on the left) to the nodes from the network (on the right). 
+  Nodes that are bijectively mapped are connected with dotted line. When displaying the tree all the edges in the path from $u$ to $v$
+  will be contracted to the single edge form $u_t$ to $v_t$.}
+  \label{mapping-example}
+\end{figure}
+
+We have extra $O(tn^2)$ literals to match input trees to the network. Hence, we have $O(tn^2)$ literals in total.
 
 We specify constraints for relations between network nodes and tree nodes. 
-First of all we define at-least-one and at-most-one constraints for literals $x$ and $up$. Note that in case 
+First of all we define at-least-one and at-most-one constraints for literals $x$ and $a$. Note that in case 
 of $x$ literals we have restriction that at most one node from tree corresponds to the network node, and that at 
-most one node from network corresponds to the tree node. Because of dummy roots we know that roots of input trees 
-are bijectively mapped to the root of the network so we have $x_{t,root_t,root}$ set to true for every tree. Also 
-consider an obvious observation that $x_{t,s,v}$ implies $used_{t,v}$.
+most one node from network corresponds to the tree node. These clauses are defined in sections 1-2 of Table~\ref{mapping-table}.
+Because of dummy roots we know that roots of input trees 
+are bijectively mapped to the root of the network so we have $x_{t,\rho_t,\rho}$ set to true for every tree. Also 
+consider an obvious observation that $x_{t,v_t,v}$ implies $u_{t,v}$. See the Section 3 of Table~\ref{mapping-table} for these clauses.
 
-Furthermore if we know that node $v$ is leaf and its parent $u$ corresponds to some node $tv$ from tree $t$, 
-then we can conclude that $up_{t,v,u}$ is true i.e. $u$ is direct parent of $v$ in tree $t$. Same observation 
-can be done for non-leaves, i.e. if we know that $v$ corresponds to $tv$ and other node $u$ corresponds to $tu$ 
-and $tu$ is parent of $tv$ then $u$ is direct parent of $v$ considering tree $t$. On the other hand if we know 
-that $v$ corresponds to $tv$ and we know that $u$ is direct parent of $v$ considering tree $t$, then $u$ should 
-correspond to parent of $tv$. We also should take care about numeration so we add constraint that says that if node 
-$v$ has greater number than node $u$ then their corresponding nodes from tree can not have reversed order of 
-numbers, i.e. $x_{t,tv,v} \rightarrow \neg x_{t,tu,u}$ for each $tu$ and $tv$ such that $tu > tv$.
-
-Next we add constraints that connect child-parent relations from trees with indirect child-parent relations in 
-the network. First of all if $u$ is a direct parent of node $v$ and $u$ is used to display tree $t$ then $u$ is 
-also the parent of $v$ considering tree $t$. And vice versa if we know that $u$ is parent of $v$ in tree $t$ then 
-$u$ should be used for displaying that tree. If we do not use $u$ for displaying tree $t$ then we should share the 
-information stored in $up$ variables between $v$ and $u$ because they will have the same parent considering tree $t$. 
-We do this with the following constraints:
-
-$$\forall t \in T,v \in V \cup L, u \in PP(v), u \in V, w \in PP(u)$$
-$$(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$$
-$$(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$$
-
-We also add clauses to forbid incorrect numeration, if node $v$ has reticulation parent $u$ then there can not 
-exist node $w$ that its number is less than number of $v$ and $up_{t,u,w}$ is true. And for all $w$ with numbers 
-greater than $v$ we add clauses to share information of $up$ variables, we do this the same way as in previous observation.
-
-Before adding similar constraints for child-parent relations of reticulation nodes we add some restrictions on
-$rused$ literals. First of all if for any reticulation node $v$ its child is regular node we should use $v$ for 
-displaying tree. If its child is reticulation node then we shouldn't use node $v$ unless its child is used. We 
-also should forbid usage of node $v$ when its direction as parent of $u$ differs from direction specified in 
-$u$, and we should use node $v$ if its direction matches direction specified in $u$ and $u$ itself is used.
-
-Now we consider reticulation node $v$ and its parent $u$. If $u$ is reticulation node then we should share information 
-about their parent considering tree $t$ but only when direction of parent $u$ matches direction specified in $v$. 
-If $u$ is regular node and $u$ is used for displaying then $u$ is direct parent of $v$ considering tree $t$.
-On the other hand if $u$ is not used then we should share information about their parent considering tree $t$ also 
-only when direction of $u$ matches direction specified in $v$.
-
-The next step formids meaningless values of $used$ literals. Consider reticulation node $v$ and one of its parents $u$. 
-$u$ can not be used for displaying current tree if its direction differs from direction specified in $v$ or if $v$ is 
-not used for displaying itself.
-
-We finish tree mapping by adding heuristic constraints. Notice that number of node in network can not be less than the 
-size of the sub-tree of corresponding node $tv$ in tree $t$ and also it can not be greater than size of the tree minus 
-depth of $tv$. Also if node $tv_1$ in tree $t_1$ and node $tv_2$ in tree $t_2$ have disjoint sets of taxa in their 
-subtrees then they can not be mapped to the same node in network.
-
-Again the most expensive clauses are clauses that represent uniqueness of variables $up$ and $x$. We have $O(n^2)$ clauses for
-each node for each tree, so we have $O(tn^3)$ clauses to map trees to the network. This sums up to $O(tn^3)$ clauses in total.
-
-\begin{table}
+\begin{table}[t]
 \centering
-\caption{Clauses to map trees to network}
-\scalebox{0.9}{
-\begin{tabular}{l | l}
-  Clauses & Range \\
+\caption{Clauses for bijective mapping of the tree nodes to the network nodes.}
+\begin{tabular}{l | l | l}
+  & Clause & Range \\
   
   \hline
-  $up_{t,v,u_1} \vee ... \vee up_{t,v,u_k}$ &
+  1.1 &
+  $a_{t,v,u_1} \vee ... \vee a_{t,v,u_k}$ &
   $v \in V \cup L \cup R, u_1 ... u_k \in PU(v)$
   \\
-  $up_{t,v,u} \rightarrow \neg up_{t,v,w}$ &
+  1.2 &
+  $a_{t,v,u} \rightarrow \neg a_{t,v,w}$ &
   $v \in V \cup L \cup R, u, w \in PU(v)$
   \\
   
   \hline
+  2.1 &
   $x_{t,t_v,v_1} \vee ... \vee x_{t,t_v,v_k}$ &
   $t \in T, t_v \in V(t), v_1 ... v_k \in V$
   \\
+  2.2 &
   $x_{t,t_v,v} \rightarrow \neg x_{t,t_v,w}$ &
   $t \in T, t_v \in V(t), v, w \in V$
   \\
+  2.3 &
   $x_{t,t_v,v} \rightarrow \neg x_{t,t_w,v}$ &
   $t \in T, t_v, t_w \in V(t), v \in V$
   \\
 
   \hline
-  $x_{t,tv,v} \rightarrow used_{t,v}$ &
-  $t \in T,v \in V, tv \in V(t)$  
+  3.1 &
+  $x_{t,v_t,v} \rightarrow u_{t,v}$ &
+  $t \in T,v \in V, v_t \in V(t)$  
   \\
-  $x_{t,root_t,root}$ &
-  $t \in T,root_t = root(t)$
+  3.2 &
+  $x_{t,\rho_t,\rho}$ &
+  $t \in T,\rho_t = \rho(t)$
   \\
   
   \hline
-  $x_{t,tu,u} \rightarrow up_{t,v,u}$ &
-  $t \in T, v \in L, u \in PP(v), tu \in V(t)$
+  4.1 &
+  $x_{t,u_t,u} \rightarrow a_{t,v,u}$ &
+  $t \in T, v \in L, u \in PP(v), u_t \in V(t)$
   \\
   
-  $(x_{t,tv,v} \wedge x_{t,tu,u}) \rightarrow up_{t,v,u}$ &
-  $t \in T, v \in V, u \in PP(v), tv \in V(t), tu = p(tv)$
+  4.2 &
+  $(x_{t,v_t,v} \wedge x_{t,u_t,u}) \rightarrow a_{t,v,u}$ &
+  $t \in T, v \in V, u \in PP(v), v_t \in V(t), u_t = p(v_t)$
   \\
   
-  $(x_{t,tv,v} \wedge up_{t,v,u}) \rightarrow x_{t,tu,u}$ &
-  $t \in T, v \in V, u \in PP(v), tv \in V(t), tu = p(tv)$
+  4.3 &
+  $(x_{t,v_t,v} \wedge a_{t,v,u}) \rightarrow x_{t,u_t,u}$ &
+  $t \in T, v \in V, u \in PP(v), v_t \in V(t), u_t = p(v_t)$
   \\
 
-  $x_{t,tv,v} \rightarrow \neg x_{t,tu,u}$ &
-  $t \in T, v \in V, u \in V, tv \in V(t), tu = p(tv), u < v$
+  4.4 &
+  $x_{t,v_t,v} \rightarrow \neg x_{t,u_t,u}$ &
+  $t \in T, v \in V, u \in V, v_t \in V(t), u_t = p(v_t), u < v$
   \\
   
   \hline
-  $(parent_{v,u} \wedge used_{t,u}) \rightarrow up_{t,v,u}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in V$
-  \\
-    
-  $(parent_{v,u} \wedge up_{t,v,u}) \rightarrow used_{t,u}$	&
-  $t \in T,v \in V \cup L, u \in PP(v), u \in V$
-  \\
-   
-  $(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in V, w \in PP(u)$
-  \\
-    
-  $(parent_{v,u} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in V, w \in PP(u)$
-  \\
-
-  $parent_{v,u} \rightarrow \neg up_{t,u,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in R, w \in PU(u), w \leq v$
+  5.1 &
+  $\neg x_{t,v_t,v}$ &
+  $t \in T, v \in V, v_t \in V(t), v_t < \mathrm{size}(\mathrm{subtree}(v_t))$
   \\
   
-  $(parent_{v,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in R, w \in PU(u), w > v$
+  5.2 &
+  $\neg x_{t,v_t,v}$ &
+  $t \in T, v \in V, v_t \in V(t), v_t > \mathrm{size}(t) - \mathrm{depth}(v_t)$
   \\
   
-  $(parent_{v,u} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in R, w \in PU(u), w > v$
+  5.3 &
+  $\neg x_{t,v_t,v} \vee \neg x_{t',v_{t'},v}$ &
+  $t, t' \in T, v \in V, v_t \in V(t), v_{t'} \in V(t')$ and
   \\
-   
-  \hline
-  $ch_{v,u} \rightarrow rused_{t,v}$ &
-  $t \in T, v \in R, u \in PC(v), u \in V \cup L$
-  \\
-  $\neg rused_{t,u} \rightarrow \neg rused_{t,v}$ &
-  $t \in T, v \in R, u \in PC(v), u \in R$
-  \\
-  $(lp_{t,u,v} \wedge \neg dir_{t,u}) \rightarrow \neg rused_{t,v}$ &
-  $t \in T, v \in R, u \in PC(v), u \in R$
-  \\
-  $(rp_{t,u,v} \wedge dir_{t,u}) \rightarrow \neg rused_{t,v}$ &
-  $t \in T, v \in R, u \in PC(v), u \in R$
-  \\
-  $(lp_{t,u,v} \wedge dir_{t,u} \wedge rused_{t,u}) \rightarrow rused_{t,v}$ &
-  $t \in T, v \in R, u \in PC(v), u \in R$
-  \\
-  $(rp_{t,u,v} \wedge \neg dir_{t,u} \wedge rused_{t,u}) \rightarrow rused_{t,v}$ &
-  $t \in T, v \in R, u \in PC(v), u \in R$
-  \\
-  
-  \hline
-  $(lp_{v,u} \wedge dir_{t,v} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
-  \\
-
-  $(lp_{v,u} \wedge dir_{t,v} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
-  \\
-    
-  $(rp_{v,u} \wedge \neg dir_{t,v} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
-  \\
-  
-  $(rp_{v,u} \wedge \neg dir_{t,v} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
-  \\
-  
-  $(lp_{v,u} \wedge dir_{t,v} \wedge used_{t,u}) \rightarrow up_{t,v,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
-  \\
-    
-  $(rp_{v,u} \wedge \neg dir_{t,v} \wedge used_{t,u}) \rightarrow up_{t,v,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
-  \\
-	
-  $(lp_{v,u} \wedge dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
-  \\
- 
-  $(lp_{v,u} \wedge dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
-  \\
-  
-  $(rp_{v,u} \wedge \neg dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,u,w}) \rightarrow up_{t,v,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
-  \\
-  
-  $(rp_{v,u} \wedge \neg dir_{t,v} \wedge \neg used_{t,u} \wedge up_{t,v,w}) \rightarrow up_{t,u,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
-  \\
-  
-  \hline
-  $(\neg dir_{t,v} \wedge lp_{v,u}) \rightarrow \neg used_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
-  \\
-  
-  $(dir_{t,v} \wedge rp_{v,u}) \rightarrow \neg used_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
-  \\
-
-  $(lp_{v,u} \wedge \neg rused_{t,v}) \rightarrow \neg used_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
-  \\
-
-  $(rp_{v,u} \wedge \neg rused_{t,v}) \rightarrow \neg used_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
-  \\
-  
-  \hline
-  $\neg x_{t,tv,v}$ &
-  $t \in T, v \in V, tv \in V(t), tv < size(subtree(tv))$
-  \\
-  
-  $\neg x_{t,tv,v}$ &
-  $t \in T, v \in V, tv \in V(t), tv > size(t) - depth(tv)$
-  \\
-  
-  $\neg x_{t_1,tv_1,v} \vee \neg x_{t_2,tv_2,v}$ &
-  $t_1, t_2 \in T, v \in V, tv_1 \in V(t_1), tv_2 \in V(t_2)$ and
-  \\
-  & subtrees of $t1$ and $t2$ have disjoint sets of taxa
+  & & subtrees of $t1$ and $t2$ have disjoint sets of taxa
   
 \end{tabular}
-}
 \label{mapping-table}
 \end{table}
 
-\subsection{Solving the boolean formula and post-processing}
+Furthermore if we know that node $v$ is leaf and its parent $u$ corresponds to node $u_t$ from tree $t$, 
+then we can conclude that $a_{t,v,u}$ is true i.e. $u$ is the direct parent of $v$ in tree $t$. Same observation 
+can be done for non-leaves, i.e. if we know that $v$ corresponds to $v_t$ and other node $u$ corresponds to $u_t$ 
+and $u_t$ is parent of $v_t$ then $u$ is direct parent of $v$ considering tree $t$. On the other hand if we know 
+that $v$ corresponds to $v_t$ and we know that $u$ is direct parent of $v$ considering tree $t$, then $u$ should 
+correspond to parent of $v_t$. We also should take care about numeration so we add constraint that says that if node 
+$u_t$ is the parent of the node $v_t$ then the number of the corresponding node $u$ should be greater than the one of 
+the node $v$, i.e. $x_{t,v_t,v} \rightarrow \neg x_{t,u_t,u}$ for each $u$ and $v$ such that $u < v$. These clauses are
+presented in the Section 4 of Table~\ref{mapping-table}.
 
-To solve the generated boolean formula we use a SAT-solver CryptoMiniSat 4.2.0. Choosing the most appropriate solver 
+We also add some heuristic constraints related to the trees structure. Notice that the number of the node in the network 
+can not be less than the  size of the sub-tree of corresponding node $v_t$ in tree $t$ and also it can not be greater than 
+size of the tree minus depth of $v_t$. Also if node $v_t$ in tree $t$ and node $v_{t'}$ in tree $t'$ have disjoint sets of 
+taxa in their subtrees then they can not be mapped to the same node in network. These clauses can be found in the Section 5 of 
+Table~\ref{mapping-table}.
+
+Next we add constraints that connect child-parent relations in trees with indirect child-parent relations in 
+the network. First of all consider the regular node $u$ that is the direct parent of the node $v$ and $u$ is used 
+to display tree $t$ then $u$ is also the parent of $v$ considering tree $t$. 
+And vice versa if we know that $u$ is parent of $v$ in tree $t$ then 
+$u$ should be used for displaying that tree. If we do not use $u$ for displaying tree $t$ then we should share the 
+information stored in $up$ variables between $v$ and $u$ because they will have the same parent considering tree $t$. 
+We do this with the following constraints:
+$$\left(\left(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,u,w}\right) \rightarrow a_{t,v,w}\right)
+\wedge \left( \left(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,v,w}\right) \rightarrow a_{t,u,w} \right).$$
+These clauses are listed in the Section 1 of Table~\ref{child-parent-table}.
+
+\begin{table}[t]
+\centering
+\caption{Clauses for translating child-parent relations from the trees to the network.}
+\begin{tabular}{l | l | l}
+  & Clause & Range \\
+
+  \hline
+  1.1 &
+  $(p_{v,u} \wedge u_{t,u}) \rightarrow a_{t,v,u}$ &
+  $t \in T,v \in V \cup L, u \in PP(v), u \in V$
+  \\
+    
+  1.2 &
+  $(p_{v,u} \wedge a_{t,v,u}) \rightarrow u_{t,u}$  &
+  $t \in T,v \in V \cup L, u \in PP(v), u \in V$
+  \\
+   
+  1.3 &
+  $(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
+  $t \in T,v \in V \cup L, u \in PP(v), u \in V, w \in PP(u)$
+  \\
+    
+  1.4 &
+  $(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
+  $t \in T,v \in V \cup L, u \in PP(v), u \in V, w \in PP(u)$
+  \\
+
+  \hline
+  2.1 &
+  $(p^l_{v,u} \wedge d_{t,v} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  \\
+
+  2.2 &
+  $(p^l_{v,u} \wedge d_{t,v} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  \\
+    
+  2.3 &
+  $(p^r_{v,u} \wedge \neg d_{t,v} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  \\
+  
+  2.4 &
+  $(p^r_{v,u} \wedge \neg d_{t,v} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  \\
+  
+  2.5 &
+  $(p^l_{v,u} \wedge d_{t,v} \wedge u_{t,u}) \rightarrow a_{t,v,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V$
+  \\
+  
+  2.6 &
+  $(p^r_{v,u} \wedge \neg d_{t,v} \wedge u_{t,u}) \rightarrow a_{t,v,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V$
+  \\
+  
+  2.7 & 
+  $(p^l_{v,u} \wedge d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  \\
+ 
+  2.8 &
+  $(p^l_{v,u} \wedge d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  \\
+  
+  2.9 &
+  $(p^r_{v,u} \wedge \neg d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  \\
+  
+  2.10 &
+  $(p^r_{v,u} \wedge \neg d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  \\
+   
+  \hline
+  3.1 &
+  $(p^l_{v,u} \wedge \neg d_{t,v}) \rightarrow \neg u^r_{t,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R$
+  \\
+
+  3.2 &
+  $(p^r_{v,u} \wedge d_{t,v}) \rightarrow \neg u^r_{t,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R$
+  \\
+
+  3.3 &
+  $(p^l_{v,u} \wedge \neg d_{t,v}) \rightarrow \neg u_{t,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V$
+  \\
+  
+  3.4 & 
+  $(p^r_{v,u} \wedge d_{t,v}) \rightarrow \neg u_{t,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V$
+  \\
+
+  \hline
+  4.1 &
+  $(p^l_{v,u} \wedge d_{t,v} \wedge u^r_{t,v}) \rightarrow u^r_{t,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R$
+  \\
+
+  4.2 &
+  $(p^r_{v,u} \wedge \neg d_{t,v} \wedge u^r_{t,v}) \rightarrow u^r_{t,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R$
+  \\
+
+  4.3 &
+  $\neg u^r_{t,v} \rightarrow \neg u^r_{t,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in R$
+  \\
+  
+  4.4 &
+  $\neg u^r_{t,v} \rightarrow \neg u_{t,u}$ &
+  $t \in T, v \in R, u \in PP(v), u \in V$
+  \\
+
+  4.5 &
+  $c_{v,u} \rightarrow u^r_{t,v}$ &
+  $t \in T, v \in R, u \in PC(v), u \in V \cup L$
+  \\
+
+  \hline
+  5.1 &
+  $p_{v,u} \rightarrow \neg a_{t,u,w}$ &
+  $t \in T,v \in V \cup L, u \in PP(v), u \in R,$
+  \\ & & $w \in PU(u), w \leq v$
+  \\
+  
+  5.2 &
+  $(p_{v,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
+  $t \in T,v \in V \cup L, u \in PP(v), u \in R,$
+  \\ & & $w \in PU(u), w > v$
+  \\
+  
+  5.3 &
+  $(p_{v,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
+  $t \in T,v \in V \cup L, u \in PP(v), u \in R,$
+  \\ & & $w \in PU(u), w > v$
+  \\
+
+\end{tabular}
+\label{child-parent-table}
+\end{table}
+
+Now consider the reticulation node $v$ and its parent $u$. If $u$ is reticulation node then we should share information 
+about their parent considering tree $t$ but only when direction of parent $u$ matches direction specified in $v$. 
+If $u$ is regular node and $u$ is used for displaying then $u$ is direct parent of $v$ considering tree $t$.
+On the other hand if $u$ is not used then we should share information about their parent considering tree $t$ also 
+only when direction of $u$ matches direction specified in $v$. These constraints are presented in the Section 2 of Table~\ref{child-parent-table}.
+
+In cases when direction of $u$ does not match direction specified in $v$ we should not use it. See Section 3 of Table~\ref{child-parent-table} 
+for these clauses. If $u$ is reticulation node and its direction matches direction specified in $v$ and $v$ is used then $u$ should also be used.
+Note that if we do not use the child of node $v$ for displaying then we also should not use its parents. And the crucial point is that
+if the child of node $v$ is regular node then we should use $v$ for displaying. 
+These clauses are defined in Section 4 of Table~\ref{child-parent-table}.
+
+We also add clauses to forbid incorrect numeration, if node $v$ has reticulation parent $u$ then there can not 
+exist node $w$ that its number is less than number of $v$ and $a_{t,u,w}$ is true. And for all $w$ with numbers 
+greater than $v$ we add clauses to share information of $a$ variables. See the Section 5 of Table~\ref{child-parent-table} for these clauses.
+
+Again the most expensive clauses are clauses that represent uniqueness of variables $a$ and $x$. We have $O(n^2)$ clauses for
+each node for each tree, so we have $O(tn^3)$ clauses to map trees to the network. This sums up to $O(tn^3)$ clauses in total.
+
+\subsection{Solving the Boolean formula and post-processing}
+
+To solve the generated Boolean formula we use a SAT-solver CryptoMiniSat 4.2.0. Choosing the most appropriate solver 
 is not considered in this paper, however several experimentations were made by M. Bonet and K. John \cite {bonet2009efficiently} 
 so it is one of the topics of further research.
 
@@ -645,22 +727,38 @@ hybridization network corresponding to the original task.
 
 \section{Experiments}
 
-To test the performance of our algorithm we evaluated it on a grass (Poaceae) dataset provided by the Grass Phylogeny Working Group 
+To test the performance of our algorithm we evaluated PhyloSAT on a grass (Poaceae) dataset provided by the Grass Phylogeny Working Group 
 (Grass Phylogeny Working Group, 2001). There are 57 test cases in the dataset with up to 47 taxa. All experiments were performed using a machine with an AMD Phenom II X6 1090T 3.2 GHz 
-processor on Ubuntu 14.04. All tests were run with the time limit of 1000 seconds. For comparison we also ran PIRN$_C$ and PIRN$_{CH}$ 
+processor on Ubuntu 14.04. All tests were run with the time limit of 1000 seconds. For comparison we also ran PIRN$\mathrm{_C}$ and PIRN$\mathrm{_{CH}}$ 
 on the same test cases. 
 
-9 out of 57 test cases were not solved even by heuristic algorithms in time. Our algorithm was able to produce optimal answer for 28
-test cases. From these 28 test cases PIRN$_C$ was able to solve only 21 and in all of them hybridization number was less than 6. 
-On all the test cases running time of PIRN$_C$ was worse than running time of our algorithm.
-Even PIRN$_{CH}$ did not solve 2 of these 28 test cases in time and its running time was better than running time of our algorithm only
-on 5 test cases and significantly worse on 2 test cases. Twelve more test cases were not solved by PIRN$_C$ and our algorithm did not complete computation 
-in time, but was able to produce some (possibly non-optimal) network. PIRN$_{CH}$ did not solve 3 of these 12 cases in time, in 3 cases 
-produced less optimal network than our algorithm, in 2 cases more optimal and in the rest 4 cases results were equal. From these 12 cases PIRN$_{CH}$
-produced an optimal network for only 2, and our algorithm found an optimal network for 4 cases but was unable to prove their optimality. 
-8 more test cases had equal trees in input, so they had an obvious answer and we excluded them from consideration.
+9 out of 57 test cases were not solved even by heuristic algorithms in time. PhyloSAT was able to produce optimal answer for 28
+test cases. From these 28 test cases PIRN$\mathrm{_C}$ was able to solve only 21 and in all of them hybridization number was less than 6. 
+On all the test cases running time of PIRN$\mathrm{_C}$ was worse than running time of PhyloSAT.
+Even PIRN$\mathrm{_{CH}}$ did not solve 2 of these 28 test cases in time and its running time was better than running time of PhyloSAT only
+on 5 test cases and significantly worse on 2 test cases. Twelve more test cases were not solved by PIRN$\mathrm{_C}$ but PhyloSAT
+was able to produce some (possibly non-optimal) network. PIRN$\mathrm{_{CH}}$ did not solve 3 of these 12 cases in time, in 3 cases 
+produced less optimal network than PhyloSAT, in 2 cases more optimal and in the rest 4 cases results were equal. From these 12 cases PIRN$\mathrm{_{CH}}$
+produced an optimal network for only 2, and PhyloSAT found an optimal network for 4 cases but was unable to prove their optimality. 
+8 more test cases had equal trees in input, so they had an obvious answer.
+Results of the simulation are summarized in Table~\ref{exp-results-table}.
 
-Experiments showed that in some cases our algorithm is able to find an optimal network but then it spends a lot of time trying to find the network 
+\begin{table}[t]
+\centering
+\caption{Experimental results}
+\begin{tabular}{l | l | l}
+  Algorithm & Solved cases & Optimally solved cases \\
+  
+  \hline
+  PhyloSAT & 48 & 32 \\
+  PIRN$\mathrm{_C}$ & 26 & 26 \\
+  PIRN$\mathrm{_{CH}}$ & 43 & 28 \\
+  
+\end{tabular}
+\label{exp-results-table}
+\end{table}
+
+Experiments showed that in some cases PhyloSAT is able to find an optimal network but then it spends a lot of time trying to find the network 
 with hybridization number one less than optimal and that time is much higher than reasonable limit. We can avoid wasting time on useless computation 
 in cases when heuristic lower bound is equal to the actual minimal hybridisation number. Besides we found 
 that it also costs a lot of time to build a network with a high hybridization number when the minimal hybridization number is low. 
@@ -668,14 +766,17 @@ Thus close upper bound of minimal hybridization number will also be very useful 
 
 \section{Conclusion}
 
-We have proposed an algorithm for construction an exact parsimonious hybridization network from multiply trees. Experiments have shown that our method 
-outperforms the PIRN$_{C}$ algorithm in all cases and performs reasonably well comparing to the heuristic PIRN$_{CH}$. However in cases of high 
-hybridization numbers search and construction of optimal network is still a very challenging problem. In future we plan to use existing 
-heuristics and estimations on lower and upper bounds on hybridization number to limit searching bounds and thus reduce running time of our algorithm.
+We have proposed an algorithm for construction an exact parsimonious hybridization network from multiply trees.
+An implementation of our algorithm is available for download at \url{https://github.com/ctlab/PhyloSAT}.
+Experiments have shown that PhyloSAT outperforms PIRN$\mathrm{_C}$ in all cases and performs reasonably well comparing 
+to the heuristic PIRN$\mathrm{_{CH}}$. 
+However in the cases of high hybridization numbers search and construction of optimal network is still a very challenging problem. 
+In future we plan to use existing heuristics and estimations on lower and upper bounds of hybridization number to 
+limit searching bounds and thus reduce the running time of our algorithm.
 
 \section*{Acknowledgements}
 
-Authors would like to thank Igor Buzhinsky and Daniil Chivilikhin for helpful comments and conversations.
+This work was financially supported by the Government of Russian Federation, Grant 074-U01. Authors would like to thank Igor Buzhinsky and Daniil Chivilikhin for helpful comments and conversations.
 
 \bibliographystyle{splncs}
 \bibliography{main}
