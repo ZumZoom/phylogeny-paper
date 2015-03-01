@@ -28,8 +28,8 @@
 \begin{abstract}
   We present an algorithm for the minimal hybridization network construction problem which is based on reducing 
   the problem to an instance of the Boolean satisfiability problem. The main idea of our algorithm is to look over
-  possible hybridosation numbers and to constrcut for each of them a Boolean formula that is satisfiable iff there
-  exists a network with such hybridisation number. We also created a software tool called PhyloSAT which implements our algorithm.
+  possible hybridization numbers and to construct for each of them a Boolean formula that is satisfiable iff there
+  exists a network with such hybridization number. We also created a software tool called PhyloSAT which implements our algorithm.
   The experimental evaluation of our algorithm on biological data shows that our method is as far as we know the 
   fastest exact algorithm for the minimal hybridization network construction problem.
 
@@ -97,7 +97,7 @@ to the tree $T'$.
 
 Now suppose we have a phylogenetic tree $T$ and a hybridization network $N$. We say that network $N$ \emph{displays} $T$ 
 if we can choose the edges of reticulation nodes in such a way that after edge-contraction the obtained tree $T'$ will be 
-isomorphic to $T$. In Figure~\ref{network-example} each of the three trees is displayed in the hybridisation network.
+isomorphic to $T$. In Figure~\ref{network-example} each of the three trees is displayed in the hybridization network.
 
 A \emph{hybridization number} of network $N$ with root $\rho$ is commonly defined as $h(N) = \sum\limits_{v \ne \rho} (d^-(v) - 1)$.
 Note that under our assumptions $h(N)$ simply equals the number of reticulation nodes.
@@ -127,7 +127,7 @@ parsimonious hybridization network \cite {wu2013algorithm}.
   \hfill
   \begin{minipage}[b]{0.40\linewidth}
     \includegraphics[width=1.3in]{pics/ans.eps}
-    \centering{\\ (b) A hybridisation network for the trees from Fig.~\ref{network-example}~(a)}
+    \centering{\\ (b) A hybridization network for the trees from Fig.~\ref{network-example}~(a)}
   \end{minipage}
   \caption{An illustration of a hybridization network for three trees with two reticulation nodes. Reticulation nodes are shown as boxes.}
   \label{network-example}
@@ -760,7 +760,7 @@ Results of the simulation are summarized in Table~\ref{exp-results-table}.
 
 Experiments showed that in some cases PhyloSAT is able to find an optimal network but then it spends a lot of time trying to find the network 
 with hybridization number one less than optimal and that time is much higher than reasonable limit. We can avoid wasting time on useless computation 
-in cases when heuristic lower bound is equal to the actual minimal hybridisation number. Besides we found 
+in cases when heuristic lower bound is equal to the actual minimal hybridization number. Besides we found 
 that it also costs a lot of time to build a network with a high hybridization number when the minimal hybridization number is low. 
 Thus close upper bound of minimal hybridization number will also be very useful and will save lots of computational time.
 
