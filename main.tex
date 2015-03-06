@@ -19,34 +19,34 @@
 \author{Vladimir Ulyantsev \and Mikhail Melnik}
 \authorrunning{V. Ulyantsev, M. Melnik} 
 \tocauthor{Vladimir~Ulyantsev, Mikhail~Melnik}
-\institute{ITMO University, Saint-Petersburg, Russia \\
+\institute{ITMO University, Saint Petersburg, Russia \\
 \email{$\{$ulyantsev,melnik$\}$@rain.ifmo.ru}}
 
 \maketitle
 \setcounter{footnote}{0}
 
 \begin{abstract}
-  We present an algorithm for the minimal hybridization network construction problem which is based on reducing 
-  the problem to an instance of the Boolean satisfiability problem. The main idea of our algorithm is to look over
+  We present an algorithm for constructing minimal hybridization networks which is based on reducing 
+  the problem to the Boolean satisfiability problem. The main idea of our algorithm is to iterate over
   possible hybridization numbers and to construct for each of them a Boolean formula that is satisfiable iff there
-  exists a network with such hybridization number. We also created a software tool called PhyloSAT which implements our algorithm.
+  exists a network with such hybridization number. The proposed algorithm is implemented in a software tool PhyloSAT.
   The experimental evaluation of our algorithm on biological data shows that our method is as far as we know the 
   fastest exact algorithm for the minimal hybridization network construction problem.
 
-  \keywords{Hybridization networks, Boolean satisfiability, SAT, bioinformatics, genetics}
+  \keywords{Phylogenetic networks, Boolean satisfiability, SAT, bioinformatics, genetics}
 \end{abstract}
 
 \section{Introduction}
 
-A phylogenetic network is a powerful tool to model reticulate
+A phylogenetic network is a powerful model for reticulate
 evolutionary processes (such as horizontal gene transfer and hybrid specification).
 Briefly, a phylogenetic network is a directed acyclic graph which has
 nodes (called reticulation nodes) with more than one incoming edge. Phylogenetic
-networks have been studied by several researchers \cite{huson2010phylogenetic, morrison2011introduction, 
+networks have been studied by several researchers~\cite{huson2010phylogenetic, morrison2011introduction, 
 nakhleh2011evolutionary}. There are several formulations of phylogenetic network
 construction problem with various modelling assumptions and different types of input data. 
 In this paper we focus on the specific type of phylogenetic networks called hybridization
-networks \cite{semple2006hybridization, chen2010hybridnet}.
+networks~\cite{semple2006hybridization, chen2010hybridnet}.
 
 As input data for hybridization network construction we consider a set of gene trees. 
 All the gene trees have the same set of leaves called taxa.
@@ -55,47 +55,46 @@ Due to reticulate evolutionary events, these trees can have different topologies
 The aim is to construct a hybridization network containing the smallest possible number of 
 reticulation nodes and displaying each of the input trees. 
 
-Most of the algorithms for hybridization network construction are heuristic \cite{wu2013algorithm, park2012murpar} 
+Most of the algorithms for hybridization network construction are heuristic~\cite{wu2013algorithm, park2012murpar} 
 and usually deal with only two trees.
-However, the exact algorithm PIRN$_\mathrm{C}$ has been introduced recently \cite{wu2013algorithm}, which is able to process more than two input trees.
+However, the exact algorithm PIRN$_\mathrm{C}$ has been introduced recently~\cite{wu2013algorithm}, which is able to process more than two input trees.
 
 In this paper we introduce a new approach for exact parsimonious
 hybridization network construction from multiple input trees based on satisfiability (SAT) solvers.
 %SAT-solver is a software package designed to solve SAT problem, which consists of finding a satisfying assignment for a Boolean formula. 
-The SAT problem is known to be NP-complete \cite{bordewich2007computing}, but state-of-the-art SAT-solvers running on modern hardware 
+The SAT problem is known to be NP-complete~\cite{bordewich2007computing}, but state-of-the-art SAT-solvers running on modern hardware 
 are able to solve SAT instances having tens of thousands of variables and hundreds of thousands of clauses in several minutes.
 
-SAT-solver based algorithms have been successfully applied to efficiently calculate evolutionary tree measures \cite{bonet2009efficiently}
+SAT-solver based algorithms have been successfully applied to efficiently calculate evolutionary tree measures~\cite{bonet2009efficiently}
 as well as to solve problems in other domains such as
-finite-state machine induction \cite{heule2010exact}, software verification \cite{biere2003bounded}.
+finite-state machine induction~\cite{heule2010exact}, software verification~\cite{biere2003bounded}.
 
 The general outline of our approach is to convert an instance of hybridization network construction 
 problem to an instance of the SAT problem (a Boolean formula), solve it using a SAT-solver and then convert 
-the satisfying assignment into the hybridization network. The formula construction process should ensure that
-the network has the minimal possible number of reticulate nodes. 
-Our approach leads to an exact algorithm that outperforms PIRN$\mathrm{_C}$ on all the test cases.
+the satisfying assignment into the hybridization network.
+Our approach leads to an exact algorithm that outperforms PIRN$\mathrm{_C}$ on our tests.
 
-The paper is structured as follows. Section 2 gives the formal definitions, section 3 describes the Boolean formula
-construction process and section 4 gives the experimental results. The paper is concluded in section 5.
+The paper is structured as follows. Section 2 gives the formal definitions, Section 3 describes the Boolean formula
+construction process and Section 4 gives the experimental results. The paper is concluded in Section 5.
 
 \section{Definitions and Background}
 
 We define a \emph{phylogenetic tree} as a leaf-labelled tree constructed over a set of taxa. 
 Throughout this paper we assume that trees are rooted and binary.
 
-Let $d^-(v)$ be the in-degree of $v$ and $d^+(v)$ be the out-degree of $v$.
+For any node $v$ let $d^-(v)$ be the in-degree of $v$ and $d^+(v)$ be the out-degree of $v$.
 A \emph{hybridization network} on a set of taxa $X$ is a directed acyclic graph 
 with a single root $\rho$ and leaves bijectively mapped to the set of taxa $X$. If $d^-(v) > 1$ then 
 node $v$ is called a \emph{reticulation node}. In this paper we assume that $d^-(v) = 2$ and $d^+(v) = 1$ is true for every reticulation node $v$.
 We do this assumption by noting that we can convert a reticulation node with in-degree 
-of three or more to a sequence of reticulation nodes with in-degrees of two \cite{wu2010close}. Other nodes are regular 
+of three or more to a sequence of reticulation nodes with in-degrees of two~\cite{wu2010close}. Other nodes are regular 
 tree nodes.
 
 Every hybridization network $N$ can be reduced to the tree. To do this we firstly keep only one of the incoming edges for each reticulation node in $N$. 
 And secondly we contract edges to remove any node $v$ such that $d^-(v) = d^+(v) = 1$. With these two steps we reduce the network $N$ 
 to the tree $T'$.
 
-Now suppose we have a phylogenetic tree $T$ and a hybridization network $N$. We say that network $N$ \emph{displays} $T$ 
+We say that hybridization network $N$ \emph{displays} phylogenetic tree $T$ 
 if we can choose the edges of reticulation nodes in such a way that after edge-contraction the obtained tree $T'$ will be 
 isomorphic to $T$. In Figure~\ref{network-example} each of the three trees is displayed in the hybridization network.
 
@@ -103,7 +102,7 @@ A \emph{hybridization number} of network $N$ with root $\rho$ is commonly define
 Note that under our assumptions $h(N)$ simply equals the number of reticulation nodes.
 
 Suppose we are given a set of $K$ phylogenetic trees $T_1, T_2, ... T_k$ over the same set of taxa. The \emph{minimal 
-hybridization network} for that set of trees is a network $N_{min}$ that displays each tree and has the lowest 
+hybridization network} for that set of trees is a network $N\mathrm{_{min}}$ that displays each tree and has the smallest 
 hybridization number possible. Note that there can be several networks with equal hybridization number.
 
 \emph{The most parsimonious hybridization network problem} is defined as follows:
@@ -112,7 +111,7 @@ network for this set of trees.
 
 It has been shown that even for the case of $k=2$ the construction of such a network is an NP-complete problem 
 \cite {bordewich2007computing}. As far as we know there exists only one algorithm for the construction of the most 
-parsimonious hybridization network \cite {wu2013algorithm}.
+parsimonious hybridization network~\cite{wu2013algorithm}.
 
 \begin{figure}[t]
   \centering
@@ -135,24 +134,24 @@ parsimonious hybridization network \cite {wu2013algorithm}.
 
 \section{Algorithm}
 
-The main idea of the algorithm is to look over possible values of the hybridization number and to construct and solve a Boolean 
+The main idea of the algorithm is to iterate over possible values of the hybridization number and to construct and solve a Boolean 
 formula that represents a hybridization network with this hybridization number.
 
 \subsection{Pre-processing}
 
 Before the actual Boolean formula encoding we modify the input and split it into several tasks to reduce the size 
-and the complexity of the problem. We do this according to the rules from \cite {bonet2009efficiently}. To define these 
+and the complexity of the problem. We do this according to the rules from~\cite{bonet2009efficiently}. To define these 
 rules we first need to define the term \emph{cluster}: a set of taxa $A$ is a cluster in trees $T_1, T_2, ... T_k$ if there 
 exists a node in each tree with the set of leaves of its subtree equal to the set $A$. The reduction rules are as follows:
 
 \begin{enumerate}
 
-\item \textbf{Sub-tree reduction rule}:
-replace every sub-tree which is present in all input trees with a leaf with a new label.
+\item \textbf{Subtree reduction rule}:
+replace every subtree which is present in all input trees with a leaf with a new label.
 
 \item \textbf{Cluster reduction rule}:
-for each cluster $A$ replace the sub-trees containing it with a leaf with a new label and add a new task for processing 
-which consists of deleted sub-trees $T'_1, T'_2, ... T'_k$ with leaf set $A$.
+for each cluster $A$ replace the subtrees containing it with a leaf with a new label and add a new task for processing 
+which consists of deleted subtrees $T'_1, T'_2, ... T'_k$ with leaf set $A$.
 
 \end{enumerate}
 
@@ -180,43 +179,45 @@ separately and then their results will be merged at the post-processing stage.
 \subsection{Search of the minimal hybridization number}
 
 To solve a subtask we need to find the lowest hybridization number $k$ such that there exists a hybridization 
-network with this hybridization number. We look through possible values of $k$ starting from the highest 
+network with this hybridization number. To do this we use downwards search, i.e. we iterate through possible values of $k$ starting from the highest 
 and construct a Boolean formula corresponding to the current $k$. 
-We decrease $k$ until the solver can't satisfy the formula, and this means that the previous value of $k$ was the 
-lowest possible. There are another strategies of searching the minimal value of $k$. For example we can start from 
+We decrease $k$ until the solver can not satisfy the formula, and this means that the previous value of $k$ was the 
+lowest possible.
+
+There are other strategies of searching the minimal value of $k$. For example, we can start from 
 zero and increase the value of $k$ until the solver will be able to satisfy the formula, or we can use binary search. 
-The results of the binary search were close to to the ones of downwards method, 
+The results of the binary search were close to the ones of downwards method, 
 but in some cases, when the binary search tried to satisfy formulae with values of $k$ less than minimal possible hybridization number, 
 its results were also poor. 
 This can be explained by an observation that it is much easier for the solver to produce an answer if the formula is satisfiable than if it is not. 
-In case of an unsatisfiable formula the solver should check every possible answer to ensure that there is no solution which is not needed if the 
+In case of an unsatisfiable formula the solver must check every possible answer to ensure that there is no solution; this is not needed if the 
 formula is satisfiable. Because of this the results of the upwards search were very poor. An obvious method 
 for reducing the search time is to limit the range of possible values of $k$ by using different heuristics to find close upper and lower bounds for $k$. 
-Possible candidates are PIRN$\mathrm{_{CH}}$ \cite{wu2013algorithm}, RIATA-HGT \cite{nakhleh2005riata} and MURPAR \cite{park2012murpar}. We do not consider such optimisations in this paper.
+Possible candidates are PIRN$\mathrm{_{CH}}$~\cite{wu2013algorithm}, RIATA-HGT~\cite{nakhleh2005riata} and MURPAR~\cite{park2012murpar}. We do not consider such optimizations in this paper.
 
 \subsection{Encoding the Boolean formula}
 
-Having a set of trees $T$ over a set of taxa $N$ and a fixed hybridization number $k$, we will construct the Boolean formula 
+Having a set of trees $T$ over a set of taxa $A$ and a fixed hybridization number $k$, we will construct the Boolean formula 
 which is satisfiable iff there exists a hybridization network that displays each tree in $T$ and its hybridization 
 number equals to $k$. To do this we first notice that a network over the set of taxa of size $n$ with hybridization number 
 $k$ will have $2 (n + k) - 1$ nodes. As we add a dummy root and a dummy leaf, we finally have $2 (n + k) + 1$ nodes, 
-$k$ of which are reticulation nodes, $n + 1$ are leaves and others are usual tree nodes. We numerate all the nodes in such a way 
+$k$ of which are reticulation nodes, $n + 1$ are leaves and others are usual tree nodes. We enumerate all the nodes in such a way 
 that leaves are numbered in range $[0,n]$, regular nodes have numbers in range $[n + 1,2n + k]$ and all reticulation nodes have numbers 
 in range $[2n + k + 1, 2(n + k)]$. We also assume that the number of any leaf or regular node is less than the number of its parent. This is done to 
-avoid consideration of isomorphic networks during SAT solving. Such numeration allows us to define the following sets of nodes for each node 
-$v$ such that $PC(v)$ is the set of possible children of $v$, $PP(v)$ is the set of possible parents of $v$ and $PU(v)$ is the set of possible ancestors of $v$. Also let $R$ be the set of reticulation nodes, $L$ be the set of leaves and $V$ be the set of regular nodes. 
-Now we will describe literals and clauses required to construct the Boolean formula.
+avoid consideration of isomorphic networks during SAT solving. Such enumeration allows us to define the following sets of nodes for each node 
+$v$: $PC(v)$ is the set of possible children of $v$, $PP(v)$ is the set of possible parents of $v$ and $PU(v)$ is the set of possible ancestors of $v$. Also let $R$ be the set of reticulation nodes, $L$ be the set of leaves and $V$ be the set of regular nodes. 
+Now we will describe variables and clauses required to construct the Boolean formula.
 
 \subsubsection{Network structure encoding.} 
 
-First of all we encode the structure of the network. We introduce the following literals: 
+First of all we encode the structure of the network. We introduce the following literals. 
 
 \begin{enumerate}
 
 \item $l_{v,u}$ and $r_{v,u}$ for each $v \in V, u \in PC(v)$ : 
 $l_{v,u}$ (or $r_{v,u}$) is true iff regular node $v$ has node $u$ as its left (right) child.
 
-\item $p_{v,u}$  for each $v \in L \cup V / root, u \in PP(v)$ :
+\item $p_{v,u}$  for each $v \in L \cup V \backslash \{\rho\}, u \in PP(v)$ :
 $p_{v,u}$ is true iff $u$ is the parent of a regular node $v$.
 
 \item $p^l_{v,u}$ and $p^r_{v,u}$ for each $v \in R, u \in PP(v)$ :
@@ -229,15 +230,15 @@ $c_{v,u}$ is true iff $u$ is a child of a reticulation node $v$.
 
 This takes $O((n + k)^2)$ literals for specifying the network structure, and by noticing that $k < n$ we have $O(n^2)$ literals.
 
-To encode the uniqueness of parents and children we use an obvious pattern that requires $O(n^2)$ clauses for each node. We say 
-that the node can have at least one parent and at most one parent. For example for parents of regular node $v$ this can be expressed 
+To encode the uniqueness of parents and children we use an obvious pattern that requires $O(n^2)$ clauses for each node. For example consider 
+parent variables. We state that a node can have at least one parent and at most one parent. For parents of the regular node $v$ this can be expressed 
 in the following way: 
 $$\left(\bigvee\limits_{u \in PP(v)} p_{v,u}\right) \wedge \left(\bigwedge\limits_{i, j \in PP(v);i < j} \left(p_{v,i} \rightarrow \neg p_{v,j}\right)\right).$$
 
 Using this pattern, we add the uniqueness constraints for literals $l$, $r$, $p$, $p^l$, $p^r$ and $c$. 
-These clauses are defined in sections 1 - 4 of Table~\ref{network-table}. 
+These clauses are defined in sections 1--4 of Table~\ref{network-table}. 
 We also add constraints to order the numbers of children of regular nodes and parents of reticulation nodes.
-They are listed in the Section 5 of Table~\ref{network-table}.
+They are listed in section 5 of Table~\ref{network-table}.
 
 \begin{table}[t]
 \centering
@@ -381,9 +382,9 @@ They are listed in the Section 5 of Table~\ref{network-table}.
 \label{network-table}
 \end{table}
 
-Network is consistent if for every pair of nodes the parent relation implies the child relation and vice versa. Thus we add constraints that connect parent literals with children literals for all the types of nodes. See sections 6 - 9 of Table~\ref{network-table} for these clauses.
-The last step of network construction is to deal with the numeration around reticulation nodes. To do this, we add constraints to fix 
-relative numbers of children and parents of reticulation nodes. They are defined in the Section 10 of Table~\ref{network-table}.
+Network is consistent if for every pair of nodes the parent relation implies the child relation and vice versa. Thus we add constraints that connect parent literals with children literals for all the types of nodes. See sections 6--9 of Table~\ref{network-table} for these clauses.
+The last step of network construction is to deal with the enumeration around reticulation nodes. To do this, we add constraints to fix 
+relative numbers of children and parents of reticulation nodes. They are defined in section 10 of Table~\ref{network-table}.
 
 Since we need $O(n^2)$ clauses for each node to represent the uniqueness of its parents and children 
 and $O(n)$ clauses for each node to represent the parents-children relation, we finally get $O(n^3)$ clauses in total 
@@ -392,24 +393,24 @@ to represent the network structure.
 \subsubsection{Mapping trees to the network.}
 
 To express that the network contains all the input trees we add literals that represent the mapping of the tree nodes to 
-the network nodes:
+the network nodes.
 
 \begin{enumerate}
 
 \item $x_{t,v_t,v}$ for each $t \in T, v_t \in V(t), v \in V$ :
 $x_{t,s,v}$ is true iff regular node $v$ represents node $v_t$ from tree $t$, i.e. $x$ literals represent bijective 
-mapping of network nodes to tree nodes. An example of such mapping is illustrated in Figure~\ref{mapping-example}.
+mapping of network nodes to tree nodes. An example of such mapping is shown in Figure~\ref{mapping-example}.
 Note that leaves of the trees are bijectively mapped to leaves of the network thus there is no need to introduce $x$ variables for them.
 
 \item $d_{t,v}$ for each $t \in T, v \in R$ :
 $d_{t,v}$ is true iff left parent edge of reticulation node $v$ is used to display tree $t$,
- i.e. it specifies direction of necessary parent to display current tree
+ i.e. it specifies direction of necessary parent to display current tree.
 
 \item $u^r_{t,v}$ for each $t \in T, v \in R$ :
-$u^r_{t,v}$ is true iff child of reticulation node $v$ is used to display tree $t$
+$u^r_{t,v}$ is true iff child of reticulation node $v$ is used to display tree $t$.
 
 \item $u_{t,v}$ for each $t \in T, v \in V$ :
-$u_{t,v}$ is true iff regular node $v$ is used to display tree $t$
+$u_{t,v}$ is true iff regular node $v$ is used to display tree $t$.
 
 \item $a_{t,v,u}$ for each $t \in T, v \in V, u \in PU(v)$ :
 $a_{t,v,u}$ is true iff the regular node $u$ is an ancestor of node $v$ and node $u$ corresponds to such node $u_t$ 
@@ -433,11 +434,11 @@ We have extra $O(tn^2)$ literals to match input trees to the network. Hence, we 
 
 We specify constraints for relations between network nodes and tree nodes. 
 First of all we define at-least-one and at-most-one constraints for literals $x$ and $a$. Note that in case 
-of $x$ literals we have restriction that at most one node from tree corresponds to the network node, and that at 
-most one node from network corresponds to the tree node. These clauses are defined in sections 1-2 of Table~\ref{mapping-table}.
+of $x$ literals we have a restriction that at most one node from the tree corresponds to the network node, and that at 
+most one node from the network corresponds to the tree node. These clauses are defined in sections 1--2 of Table~\ref{mapping-table}.
 Because of dummy roots we know that roots of input trees 
 are bijectively mapped to the root of the network so we have $x_{t,\rho_t,\rho}$ set to true for every tree. Also 
-consider an obvious observation that $x_{t,v_t,v}$ implies $u_{t,v}$. See the Section 3 of Table~\ref{mapping-table} for these clauses.
+consider an obvious observation that $x_{t,v_t,v}$ implies $u_{t,v}$. See section 3 of Table~\ref{mapping-table} for these clauses.
 
 \begin{table}[t]
 \centering
@@ -521,32 +522,32 @@ consider an obvious observation that $x_{t,v_t,v}$ implies $u_{t,v}$. See the Se
 \label{mapping-table}
 \end{table}
 
-Furthermore if we know that node $v$ is leaf and its parent $u$ corresponds to node $u_t$ from tree $t$, 
+Furthermore, if we know that node $v$ is a leaf and its parent $u$ corresponds to node $u_t$ from tree $t$, 
 then we can conclude that $a_{t,v,u}$ is true i.e. $u$ is the direct parent of $v$ in tree $t$. Same observation 
-can be done for non-leaves, i.e. if we know that $v$ corresponds to $v_t$ and other node $u$ corresponds to $u_t$ 
-and $u_t$ is parent of $v_t$ then $u$ is direct parent of $v$ considering tree $t$. On the other hand if we know 
-that $v$ corresponds to $v_t$ and we know that $u$ is direct parent of $v$ considering tree $t$, then $u$ should 
-correspond to parent of $v_t$. We also should take care about numeration so we add constraint that says that if node 
-$u_t$ is the parent of the node $v_t$ then the number of the corresponding node $u$ should be greater than the one of 
+can be done for non-leaves, i.e. if we know that $v$ corresponds to $v_t$ and another node $u$ corresponds to $u_t$ 
+and $u_t$ is parent of $v_t$ then $u$ is the direct parent of $v$ considering tree $t$. On the other hand if we know 
+that $v$ corresponds to $v_t$ and we know that $u$ is the direct parent of $v$ considering tree $t$, then $u$ should 
+correspond to parent of $v_t$. We also should take care about enumeration, so we add a constraint stating that if node 
+$u_t$ is the parent of the node $v_t$, then the number of the corresponding node $u$ should be greater than the one of 
 the node $v$, i.e. $x_{t,v_t,v} \rightarrow \neg x_{t,u_t,u}$ for each $u$ and $v$ such that $u < v$. These clauses are
-presented in the Section 4 of Table~\ref{mapping-table}.
+presented in section 4 of Table~\ref{mapping-table}.
 
 We also add some heuristic constraints related to the trees structure. Notice that the number of the node in the network 
-can not be less than the  size of the sub-tree of corresponding node $v_t$ in tree $t$ and also it can not be greater than 
-size of the tree minus depth of $v_t$. Also if node $v_t$ in tree $t$ and node $v_{t'}$ in tree $t'$ have disjoint sets of 
-taxa in their subtrees then they can not be mapped to the same node in network. These clauses can be found in the Section 5 of 
+can not be less than the  size of the subtree of the corresponding node $v_t$ in tree $t$ and also it can not be greater than 
+the size of the tree minus depth of $v_t$. Also if node $v_t$ in tree $t$ and node $v_{t'}$ in tree $t'$ have disjoint sets of 
+taxa in their subtrees then they can not be mapped to the same node in the network. These clauses can be found in section 5 of 
 Table~\ref{mapping-table}.
 
-Next we add constraints that connect child-parent relations in trees with indirect child-parent relations in 
+Next, we add constraints that connect child-parent relations in trees with indirect child-parent relations in 
 the network. First of all consider the regular node $u$ that is the direct parent of the node $v$ and $u$ is used 
 to display tree $t$ then $u$ is also the parent of $v$ considering tree $t$. 
-And vice versa if we know that $u$ is parent of $v$ in tree $t$ then 
+Vice versa, if we know that $u$ is the parent of $v$ in tree $t$, then 
 $u$ should be used for displaying that tree. If we do not use $u$ for displaying tree $t$ then we should share the 
-information stored in $up$ variables between $v$ and $u$ because they will have the same parent considering tree $t$. 
+information stored in the $a$ variables between $v$ and $u$ because they will have the same parent considering tree $t$. 
 We do this with the following constraints:
 $$\left(\left(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,u,w}\right) \rightarrow a_{t,v,w}\right)
 \wedge \left( \left(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,v,w}\right) \rightarrow a_{t,u,w} \right).$$
-These clauses are listed in the Section 1 of Table~\ref{child-parent-table}.
+These clauses are listed in section 1 of Table~\ref{child-parent-table}.
 
 \begin{table}[t]
 \centering
@@ -696,47 +697,48 @@ These clauses are listed in the Section 1 of Table~\ref{child-parent-table}.
 \label{child-parent-table}
 \end{table}
 
-Now consider the reticulation node $v$ and its parent $u$. If $u$ is reticulation node then we should share information 
-about their parent considering tree $t$ but only when direction of parent $u$ matches direction specified in $v$. 
-If $u$ is regular node and $u$ is used for displaying then $u$ is direct parent of $v$ considering tree $t$.
-On the other hand if $u$ is not used then we should share information about their parent considering tree $t$ also 
-only when direction of $u$ matches direction specified in $v$. These constraints are presented in the Section 2 of Table~\ref{child-parent-table}.
+Now consider the reticulation node $v$ and its parent $u$. If $u$ is a reticulation node then we should share information 
+about its parent considering tree $t$ but only when direction of parent $u$ matches direction specified in $v$. 
+If $u$ is a regular node and $u$ is used for displaying tree $t$, then $u$ is the direct parent of $v$ considering tree $t$.
+On the other hand, if $u$ is not used then we should share information about its parent considering tree $t$ also 
+only when direction of $u$ matches direction specified in $v$. These constraints are presented in section 2 of Table~\ref{child-parent-table}.
 
-In cases when direction of $u$ does not match direction specified in $v$ we should not use it. See Section 3 of Table~\ref{child-parent-table} 
-for these clauses. If $u$ is reticulation node and its direction matches direction specified in $v$ and $v$ is used then $u$ should also be used.
+In cases when direction of $u$ does not match direction specified in $v$ we should not use it. See section 3 of Table~\ref{child-parent-table} 
+for these clauses. If $u$ is a reticulation node, its direction matches direction specified in $v$ and $v$ is used, then $u$ should also be used.
 Note that if we do not use the child of node $v$ for displaying then we also should not use its parents. And the crucial point is that
-if the child of node $v$ is regular node then we should use $v$ for displaying. 
-These clauses are defined in Section 4 of Table~\ref{child-parent-table}.
+if the child of node $v$ is a regular node then we should use $v$ for displaying. 
+These clauses are defined in section 4 of Table~\ref{child-parent-table}.
 
-We also add clauses to forbid incorrect numeration, if node $v$ has reticulation parent $u$ then there can not 
-exist node $w$ that its number is less than number of $v$ and $a_{t,u,w}$ is true. And for all $w$ with numbers 
-greater than $v$ we add clauses to share information of $a$ variables. See the Section 5 of Table~\ref{child-parent-table} for these clauses.
+We also add clauses to forbid incorrect numeration, if node $v$ has a reticulation parent $u$ then there cannot 
+exist a node $w$ that its number is less than the number of $v$, and $a_{t,u,w}$ is true. And for all $w$ with numbers 
+greater than $v$ we add clauses to share information of $a$ variables. See section 5 of Table~\ref{child-parent-table} for these clauses.
 
 Again the most expensive clauses are clauses that represent uniqueness of variables $a$ and $x$. We have $O(n^2)$ clauses for
 each node for each tree, so we have $O(tn^3)$ clauses to map trees to the network. This sums up to $O(tn^3)$ clauses in total.
 
 \subsection{Solving the Boolean formula and post-processing}
 
-To solve the generated Boolean formula we use a SAT-solver CryptoMiniSat 4.2.0. Choosing the most appropriate solver 
-is not considered in this paper, however several experimentations were made by M. Bonet and K. John \cite {bonet2009efficiently} 
-so it is one of the topics of further research.
+To solve the generated Boolean formula we use a SAT-solver CryptoMiniSat 4.2.0 (\url{http://www.msoos.org/cryptominisat4/}).
+Choosing the most appropriate solver is not considered in this paper, however several experimentations were made by 
+M. Bonet and K. John~\cite{bonet2009efficiently} so it is one of the topics of further research.
 
-After solving a task we recover network from the SAT-solver output. After that we delete the dummy root and the corresponding 
-leaf from the network. And when all the subtasks of the original task are solved, we merge their networks into the single 
+After solving a task we reconstruct the network from the SAT-solver output. After that we delete the dummy root and the corresponding 
+leaf from the network. And when all the subtasks of the original task are solved, we merge their networks into a single 
 hybridization network corresponding to the original task.
 
 \section{Experiments}
 
 To test the performance of our algorithm we evaluated PhyloSAT on a grass (Poaceae) dataset provided by the Grass Phylogeny Working Group 
 (Grass Phylogeny Working Group, 2001). There are 57 test cases in the dataset with up to 47 taxa. All experiments were performed using a machine with an AMD Phenom II X6 1090T 3.2 GHz 
-processor on Ubuntu 14.04. All tests were run with the time limit of 1000 seconds. For comparison we also ran PIRN$\mathrm{_C}$ and PIRN$\mathrm{_{CH}}$ 
+processor on Ubuntu 14.04. All tests were run with a time limit of 1000 seconds. For comparison we also ran PIRN$\mathrm{_C}$ and PIRN$\mathrm{_{CH}}$ 
 on the same test cases. 
 
-9 out of 57 test cases were not solved even by heuristic algorithms in time. PhyloSAT was able to produce optimal answer for 28
-test cases. From these 28 test cases PIRN$\mathrm{_C}$ was able to solve only 21 and in all of them hybridization number was less than 6. 
-On all the test cases running time of PIRN$\mathrm{_C}$ was worse than running time of PhyloSAT.
-Even PIRN$\mathrm{_{CH}}$ did not solve 2 of these 28 test cases in time and its running time was better than running time of PhyloSAT only
-on 5 test cases and significantly worse on 2 test cases. Twelve more test cases were not solved by PIRN$\mathrm{_C}$ but PhyloSAT
+Out of 57 test cases, 9 were not solved even by heuristic algorithms in time. PhyloSAT was able to produce the optimal answer for 28
+test cases. From these 28 test cases PIRN$\mathrm{_C}$ was able to solve only 21 and in all of them hybridization number was less than 6
+which shows that PIRN$\mathrm{_C}$ is not capable of building hybridization networks with large hybridization number.
+On all test cases PIRN$\mathrm{_C}$ was slower than PhyloSAT.
+Even PIRN$\mathrm{_{CH}}$ did not solve 2 of these 28 test cases in time. PIRN$\mathrm{_{CH}}$ was faster than PhyloSAT only
+on 5 test cases and was significantly slower on 2 test cases. Twelve more test cases were not solved by PIRN$\mathrm{_C}$, but PhyloSAT
 was able to produce some (possibly non-optimal) network. PIRN$\mathrm{_{CH}}$ did not solve 3 of these 12 cases in time, in 3 cases 
 produced less optimal network than PhyloSAT, in 2 cases more optimal and in the rest 4 cases results were equal. From these 12 cases PIRN$\mathrm{_{CH}}$
 produced an optimal network for only 2, and PhyloSAT found an optimal network for 4 cases but was unable to prove their optimality. 
@@ -760,19 +762,19 @@ Results of the simulation are summarized in Table~\ref{exp-results-table}.
 
 Experiments showed that in some cases PhyloSAT is able to find an optimal network but then it spends a lot of time trying to find the network 
 with hybridization number one less than optimal and that time is much higher than reasonable limit. We can avoid wasting time on useless computation 
-in cases when heuristic lower bound is equal to the actual minimal hybridization number. Besides we found 
-that it also costs a lot of time to build a network with a high hybridization number when the minimal hybridization number is low. 
-Thus close upper bound of minimal hybridization number will also be very useful and will save lots of computational time.
+in cases when the heuristic lower bound is equal to the actual minimal hybridization number. Besides we found 
+that it also costs a lot of time to build a network with a big hybridization number when the minimal hybridization number is small. 
+Thus, a close upper bound for the minimal hybridization number will also be very useful and will save lots of computational time.
 
 \section{Conclusion}
 
-We have proposed an algorithm for construction an exact parsimonious hybridization network from multiply trees.
+We have proposed an algorithm for constructing an exact parsimonious hybridization network from multiple phylogenetic trees.
 An implementation of our algorithm is available for download at \url{https://github.com/ctlab/PhyloSAT}.
-Experiments have shown that PhyloSAT outperforms PIRN$\mathrm{_C}$ in all cases and performs reasonably well comparing 
+Experiments showed that PhyloSAT outperforms PIRN$\mathrm{_C}$ in all cases and performs reasonably well comparing 
 to the heuristic PIRN$\mathrm{_{CH}}$. 
-However in the cases of high hybridization numbers search and construction of optimal network is still a very challenging problem. 
-In future we plan to use existing heuristics and estimations on lower and upper bounds of hybridization number to 
-limit searching bounds and thus reduce the running time of our algorithm.
+However in the cases of large hybridization numbers search and construction of optimal network is still a very challenging problem. 
+In the future we plan to use existing heuristics and estimations on lower and upper bounds of the hybridization number to 
+limit search bounds and thus reduce the running time of our algorithm.
 
 \section*{Acknowledgements}
 
