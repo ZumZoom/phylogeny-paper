@@ -762,7 +762,7 @@ Results of the simulation are summarized in Table~\ref{exp-results-table}.
 
 Experiments showed that in some cases PhyloSAT is able to find an optimal network but then it spends a lot of time trying to find the network 
 with hybridization number one less than optimal and that time is much higher than reasonable limit. We can avoid wasting time on useless computation 
-in cases when the heuristic lower bound is equal to the actual minimal hybridization number. Besides we found 
+in cases when we find a network with hybridization number equal to the heuristic lower bound (like PIRN$\mathrm{_{CH}}$ does). Besides we found 
 that it also costs a lot of time to build a network with a big hybridization number when the minimal hybridization number is small. 
 Thus, a close upper bound for the minimal hybridization number will also be very useful and will save lots of computational time.
 
