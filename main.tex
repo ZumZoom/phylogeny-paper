@@ -252,133 +252,133 @@ They are listed in section 5 of Table~\ref{network-table}.
   \hline
   1.1 &
   $p_{v,u_1} \vee ... \vee p_{v,u_k}$ &
-  $v \in V, u_1 ... u_k \in PP(v)$
+  $v \in V; u_1 ... u_k \in PP(v)$
   \\
   1.2 &
   $p_{v,u} \rightarrow \neg p_{v,w}$ &
-  $v \in V, u, w \in PP(v)$
+  $v \in V; u, w \in PP(v)$
   \\
   
   \hline
   2.1 &
   $l_{v,u_1} \vee ... \vee l_{v,u_k}$ &
-  $v \in V, u_1 ... u_k \in PC(v)$
+  $v \in V; u_1 ... u_k \in PC(v)$
   \\
   2.2 &
   $l_{v,u} \rightarrow \neg l_{v,w}$ &
-  $v \in V, u, w \in PC(v)$
+  $v \in V; u, w \in PC(v)$
   \\
   2.3 &
   $r_{v,u_1} \vee ... \vee r_{v,u_k}$ &
-  $v \in V, u_1 ... u_k \in PC(v)$
+  $v \in V; u_1 ... u_k \in PC(v)$
   \\
   2.4 &
   $r_{v,u} \rightarrow \neg r_{v,w}$ &
-  $v \in V, u, w \in PC(v)$
+  $v \in V; u, w \in PC(v)$
   \\
   
   \hline
   3.1 &
   $c_{v,u_1} \vee ... \vee c_{v,u_k}$ &
-  $v \in R, u_1 ... u_k \in PC(v)$
+  $v \in R; u_1 ... u_k \in PC(v)$
   \\
   3.2 &
   $c_{v,u} \rightarrow \neg c_{v,w}$ &
-  $v \in R, u, w \in PC(v)$
+  $v \in R; u, w \in PC(v)$
   \\
   
   \hline
   4.1 &
   $p^l_{v,u_1} \vee ... \vee p^l_{v,u_k}$ &
-  $v \in R, u_1 ... u_k \in PP(v)$
+  $v \in R; u_1 ... u_k \in PP(v)$
   \\
   4.2 &
   $p^l_{v,u} \rightarrow \neg p^l_{v,w}$ &
-  $v \in R, u, w \in PP(v)$
+  $v \in R; u, w \in PP(v)$
   \\
   4.3 &
   $p^r_{v,u_1} \vee ... \vee p^r_{v,u_k}$ &
-  $v \in R, u_1 ... u_k \in PP(v)$
+  $v \in R; u_1 ... u_k \in PP(v)$
   \\
   4.4 &
   $p^r_{v,u} \rightarrow \neg p^r_{v,w}$ &
-  $v \in R, u, w \in PP(v)$
+  $v \in R; u, w \in PP(v)$
   \\
 
   \hline
   5.1 &
   $l_{v,u} \rightarrow \neg r_{v,w}$ &
-  $v \in V, u, w \in PC(v): u \geq w$
+  $v \in V; u, w \in PC(v): u \geq w$
   \\
   5.2 &
   $p^l_{v,u} \rightarrow \neg p^r_{v,w}$ &
-  $v \in R, u, w \in PP(v) : u \geq w$
+  $v \in R; u, w \in PP(v) : u \geq w$
   \\
   
   \hline
   6.1 &
   $l_{v,u} \rightarrow p_{u,v}$ &
-  $v \in V, u \in V, u \in PC(v)$
+  $v \in V; u \in V; u \in PC(v)$
   \\
   6.2 &
   $r_{v,u} \rightarrow p_{u,v}$ &
-  $v \in V, u \in V, u \in PC(v)$
+  $v \in V; u \in V; u \in PC(v)$
   \\
   6.3 &
   $p_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
-  $v \in V, u \in V, u \in PC(v)$
+  $v \in V; u \in V; u \in PC(v)$
   \\
   
   \hline
   7.1 &
   $l_{v,u} \rightarrow (p^l_{u,v} \vee p^r_{u,v})$ &
-  $v \in V, u \in R, u \in PC(v)$
+  $v \in V; u \in R; u \in PC(v)$
   \\
   7.2 &
   $r_{v,u} \rightarrow (p^l_{u,v} \vee p^r_{u,v})$ &
-  $v \in V, u \in R, u \in PC(v)$
+  $v \in V; u \in R; u \in PC(v)$
   \\
   7.3 &
   $p^l_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
-  $v \in V, u \in R, u \in PC(v)$
+  $v \in V; u \in R; u \in PC(v)$
   \\
   7.4 &
   $p^r_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
-  $v \in V, u \in R, u \in PC(v)$
+  $v \in V; u \in R; u \in PC(v)$
   \\
   
   \hline 
   8.1 &
   $c_{v,u} \rightarrow p_{u,v}$ &
-  $v \in R, u \in V, u \in PC(v)$
+  $v \in R; u \in V; u \in PC(v)$
   \\
   8.2 &
   $p_{u,v} \rightarrow c_{v,u}$ &
-  $v \in R, u \in V, u \in PC(v)$
+  $v \in R; u \in V; u \in PC(v)$
   \\
   
   \hline
   9.1 &
   $c_{v,u} \rightarrow (p^l_{u,v} \vee p^r_{u,v})$ &
-  $v \in R, u \in R, u \in PC(v)$
+  $v \in R; u \in R; u \in PC(v)$
   \\
   9.2 &
   $p^l_{u,v} \rightarrow c_{v,u}$ &
-  $v \in R, u \in R, u \in PC(v)$
+  $v \in R; u \in R; u \in PC(v)$
   \\
   9.3 &
   $p^r_{u,v} \rightarrow c_{v,u}$ &
-  $v \in R, u \in R, u \in PC(v)$
+  $v \in R; u \in R; u \in PC(v)$
   \\
   
   \hline
   10.1 &
   $c_{v,u} \rightarrow \neg p^l_{v,w}$ &
-  $v \in R, u \in PC(v), w \in PP(v): u \geq w$
+  $v \in R; u \in PC(v); w \in PP(v): u \geq w$
   \\
   10.2 &
   $c_{v,u} \rightarrow \neg p^r_{v,w}$ &
-  $v \in R, u \in PC(v), w \in PP(v): u \geq w$
+  $v \in R; u \in PC(v); w \in PP(v): u \geq w$
   \\
   
 \end{tabular}
@@ -452,72 +452,72 @@ note that $x_{t,v_t,v}$ implies $u_{t,v}$ by definition. See section 3 of Table~
   \hline
   1.1 &
   $a_{t,v,u_1} \vee ... \vee a_{t,v,u_k}$ &
-  $v \in V \cup L \cup R, u_1 ... u_k \in PU(v)$
+  $v \in V \cup L \cup R; u_1 ... u_k \in PU(v)$
   \\
   1.2 &
   $a_{t,v,u} \rightarrow \neg a_{t,v,w}$ &
-  $v \in V \cup L \cup R, u, w \in PU(v)$
+  $v \in V \cup L \cup R; u, w \in PU(v)$
   \\
   
   \hline
   2.1 &
   $x_{t,t_v,v_1} \vee ... \vee x_{t,t_v,v_k}$ &
-  $t \in T, t_v \in V(t), v_1 ... v_k \in V$
+  $t \in T; t_v \in V(t); v_1 ... v_k \in V$
   \\
   2.2 &
   $x_{t,t_v,v} \rightarrow \neg x_{t,t_v,w}$ &
-  $t \in T, t_v \in V(t), v, w \in V$
+  $t \in T; t_v \in V(t); v, w \in V$
   \\
   2.3 &
   $x_{t,t_v,v} \rightarrow \neg x_{t,t_w,v}$ &
-  $t \in T, t_v, t_w \in V(t), v \in V$
+  $t \in T; t_v, t_w \in V(t); v \in V$
   \\
 
   \hline
   3.1 &
   $x_{t,v_t,v} \rightarrow u_{t,v}$ &
-  $t \in T,v \in V, v_t \in V(t)$  
+  $t \in T; v \in V; v_t \in V(t)$  
   \\
   3.2 &
   $x_{t,\rho_t,\rho}$ &
-  $t \in T,\rho_t = \rho(t)$
+  $t \in T; \rho_t = \rho(t)$
   \\
   
   \hline
   4.1 &
   $x_{t,u_t,u} \rightarrow a_{t,v,u}$ &
-  $t \in T, v \in L, u \in PP(v), u_t \in V(t)$
+  $t \in T; v \in L; u \in PP(v); u_t \in V(t)$
   \\
   
   4.2 &
   $(x_{t,v_t,v} \wedge x_{t,u_t,u}) \rightarrow a_{t,v,u}$ &
-  $t \in T, v \in V, u \in PP(v), v_t \in V(t), u_t = p(v_t)$
+  $t \in T; v \in V; u \in PP(v); v_t \in V(t): u_t = p(v_t)$
   \\
   
   4.3 &
   $(x_{t,v_t,v} \wedge a_{t,v,u}) \rightarrow x_{t,u_t,u}$ &
-  $t \in T, v \in V, u \in PP(v), v_t \in V(t), u_t = p(v_t)$
+  $t \in T; v \in V; u \in PP(v); v_t \in V(t): u_t = p(v_t)$
   \\
 
   4.4 &
   $x_{t,v_t,v} \rightarrow \neg x_{t,u_t,u}$ &
-  $t \in T, v \in V, u \in V, v_t \in V(t), u_t = p(v_t), u < v$
+  $t \in T; v \in V; u \in V; v_t \in V(t); u_t = p(v_t): u < v$
   \\
   
   \hline
   5.1 &
   $\neg x_{t,v_t,v}$ &
-  $t \in T, v \in V, v_t \in V(t), v_t < \mathrm{size}(\mathrm{subtree}(v_t))$
+  $t \in T; v \in V; v_t \in V(t): v_t < \mathrm{size}(\mathrm{subtree}(v_t))$
   \\
   
   5.2 &
   $\neg x_{t,v_t,v}$ &
-  $t \in T, v \in V, v_t \in V(t), v_t > \mathrm{size}(t) - \mathrm{depth}(v_t)$
+  $t \in T; v \in V; v_t \in V(t): v_t > \mathrm{size}(t) - \mathrm{depth}(v_t)$
   \\
   
   5.3 &
   $\neg x_{t,v_t,v} \vee \neg x_{t',v_{t'},v}$ &
-  $t, t' \in T, v \in V, v_t \in V(t), v_{t'} \in V(t')$ and
+  $t, t' \in T; v \in V; v_t \in V(t); v_{t'} \in V(t') :$
   \\
   & & subtrees of $t$ and $t'$ have disjoint sets of taxa
   
@@ -561,139 +561,139 @@ These clauses are listed in section 1 of Table~\ref{child-parent-table}.
   \hline
   1.1 &
   $(p_{v,u} \wedge u_{t,u}) \rightarrow a_{t,v,u}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in V$
+  $t \in T; v \in V \cup L; u \in PP(v); u \in V$
   \\
     
   1.2 &
   $(p_{v,u} \wedge a_{t,v,u}) \rightarrow u_{t,u}$  &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in V$
+  $t \in T; v \in V \cup L; u \in PP(v); u \in V$
   \\
    
   1.3 &
   $(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in V, w \in PP(u)$
+  $t \in T; v \in V \cup L; u \in PP(v); u \in V; w \in PP(u)$
   \\
     
   1.4 &
   $(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in V, w \in PP(u)$
+  $t \in T; v \in V \cup L; u \in PP(v); u \in V; w \in PP(u)$
   \\
 
   \hline
   2.1 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  $t \in T; v \in R; u \in PP(v); u \in R; w \in PU(u)$
   \\
 
   2.2 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  $t \in T; v \in R; u \in PP(v); u \in R; w \in PU(u)$
   \\
     
   2.3 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  $t \in T; v \in R; u \in PP(v); u \in R; w \in PU(u)$
   \\
   
   2.4 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R, w \in PU(u)$
+  $t \in T; v \in R; u \in PP(v); u \in R; w \in PU(u)$
   \\
   
   2.5 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge u_{t,u}) \rightarrow a_{t,v,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
+  $t \in T; v \in R; u \in PP(v); u \in V$
   \\
   
   2.6 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge u_{t,u}) \rightarrow a_{t,v,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
+  $t \in T; v \in R; u \in PP(v); u \in V$
   \\
   
   2.7 & 
   $(p^l_{v,u} \wedge d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  $t \in T; v \in R; u \in PP(v); u \in V; w \in PU(u)$
   \\
  
   2.8 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  $t \in T; v \in R; u \in PP(v); u \in V; w \in PU(u)$
   \\
   
   2.9 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  $t \in T; v \in R; u \in PP(v); u \in V; w \in PU(u)$
   \\
   
   2.10 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V, w \in PU(u)$
+  $t \in T; v \in R; u \in PP(v); u \in V; w \in PU(u)$
   \\
    
   \hline
   3.1 &
   $(p^l_{v,u} \wedge \neg d_{t,v}) \rightarrow \neg u^r_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R$
+  $t \in T; v \in R; u \in PP(v); u \in R$
   \\
 
   3.2 &
   $(p^r_{v,u} \wedge d_{t,v}) \rightarrow \neg u^r_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R$
+  $t \in T; v \in R; u \in PP(v); u \in R$
   \\
 
   3.3 &
   $(p^l_{v,u} \wedge \neg d_{t,v}) \rightarrow \neg u_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
+  $t \in T; v \in R; u \in PP(v); u \in V$
   \\
   
   3.4 & 
   $(p^r_{v,u} \wedge d_{t,v}) \rightarrow \neg u_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
+  $t \in T; v \in R; u \in PP(v); u \in V$
   \\
 
   \hline
   4.1 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge u^r_{t,v}) \rightarrow u^r_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R$
+  $t \in T; v \in R; u \in PP(v); u \in R$
   \\
 
   4.2 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge u^r_{t,v}) \rightarrow u^r_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R$
+  $t \in T; v \in R; u \in PP(v); u \in R$
   \\
 
   4.3 &
   $\neg u^r_{t,v} \rightarrow \neg u^r_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in R$
+  $t \in T; v \in R; u \in PP(v); u \in R$
   \\
   
   4.4 &
   $\neg u^r_{t,v} \rightarrow \neg u_{t,u}$ &
-  $t \in T, v \in R, u \in PP(v), u \in V$
+  $t \in T; v \in R; u \in PP(v); u \in V$
   \\
 
   4.5 &
   $c_{v,u} \rightarrow u^r_{t,v}$ &
-  $t \in T, v \in R, u \in PC(v), u \in V \cup L$
+  $t \in T; v \in R; u \in PC(v); u \in V \cup L$
   \\
 
   \hline
   5.1 &
   $p_{v,u} \rightarrow \neg a_{t,u,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in R,$
-  \\ & & $w \in PU(u), w \leq v$
+  $t \in T; v \in V \cup L; u \in PP(v); u \in R;$
+  \\ & & $w \in PU(u): w \leq v$
   \\
   
   5.2 &
   $(p_{v,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in R,$
-  \\ & & $w \in PU(u), w > v$
+  $t \in T; v \in V \cup L; u \in PP(v); u \in R;$
+  \\ & & $w \in PU(u): w > v$
   \\
   
   5.3 &
   $(p_{v,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T,v \in V \cup L, u \in PP(v), u \in R,$
-  \\ & & $w \in PU(u), w > v$
+  $t \in T; v \in V \cup L; u \in PP(v); u \in R;$
+  \\ & & $w \in PU(u): w > v$
   \\
 
 \end{tabular}
