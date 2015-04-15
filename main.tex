@@ -748,23 +748,55 @@ Even PIRN$\mathrm{_{CH}}$ did not solve 2 of these 28 test cases in time. PIRN$\
 on 5 test cases and was significantly slower on 2 test cases. Twelve more test cases were not solved by PIRN$\mathrm{_C}$, but PhyloSAT
 was able to produce some (possibly non-optimal) network. PIRN$\mathrm{_{CH}}$ did not solve 3 of these 12 cases in time, in 3 cases 
 produced less optimal network than PhyloSAT, in 2 cases more optimal and in the rest 4 cases results were equal. From these 12 cases PIRN$\mathrm{_{CH}}$
-produced an optimal network for only 2, and PhyloSAT found an optimal network for 4 cases but was unable to prove their optimality. 
-8 more test cases had isomorphic trees in input, so they had an obvious answer.
+produced an optimal network for only 2, and PhyloSAT found an optimal network for 3 cases but was unable to prove their optimality. 
+8 more test cases had isomorphic trees in input, so they had an obvious answer of zero.
 Results of the simulation are summarized in Table~\ref{exp-results-table}.
+Also the more precise results of comparison are in Table~\ref{detailed-results}. We included only cases with hybridization number more than 6, because on less complicated tests results of all the algorithms were similar.
+The results of PIRN$\mathrm{_{C}}$ are not included because it did not manage to solve any of these cases. 
 
 \begin{table}[t]
 \centering
-\caption{Experimental results}
+\caption{Experimental results.}
 \begin{tabular}{l | l | l}
   Algorithm & Solved cases & Optimal solutions \\
   
   \hline
-  PhyloSAT & 48 & 32 \\
-  PIRN$\mathrm{_C}$ & 26 & 26 \\
-  PIRN$\mathrm{_{CH}}$ & 43 & 28 \\
+  PhyloSAT & 48 & 39 \\
+  PIRN$\mathrm{_C}$ & 29 & 29 \\
+  PIRN$\mathrm{_{CH}}$ & 43 & 36 \\
   
 \end{tabular}
 \label{exp-results-table}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Comparison of results of PIRN$\mathrm{_{CH}}$ and PhyloSAT on test cases with big hybridisation number. Runtimes in seconds are reported in brackets.}
+\begin{tabular}{l | c | c | c}
+  Test instance & PhyloSAT & PIRN$\mathrm{_{CH}}$ & Optimal solution \\
+  \hline
+  2NdhfPhyt & 6 (9) & 6 (6) & 6 \\
+  3NdhfPhytRpoc & 8 (1000) & 8 (28) & 6 \\
+  3PhytRbclRpoc & 6 (11) & 6 (3) & 6 \\
+  3RbclWaxyIts & 6 (1000) & 7 (4) & 6 \\
+  4NdhfRbclWaxyIts & 7 (1000) & 7 (35) & $\geq$ 6 \\
+  4PhytRbclRpocIts & 9 (1000) & 8 (377) & $\geq$ 6 \\
+  2RbclRpoc & 7 (1000) & 7 (42) & 7 \\
+  3NdhfWaxyIts & 8 (1000) & 8 (90) & $\geq$ 7 \\
+  3PhytRbclIts & 11 (1000) & 8 (120) & $\geq$ 7 \\
+  3PhytRpocIts & 7 (1000) & 7 (59) & 7 \\
+  4NdhfPhytRbclRpoc & 10 (1000) & 10 (287) & $\geq$ 7 \\
+  4NdhfPhytRpocIts & 10 (1000) & - & $\geq$ 7 \\
+  2NdhfPhyt & 8 (12) & - & 8 \\
+  2NdhfRbcl & 8 (1) & 8 (851) & 8 \\
+  2PhytIts & 8 (41) & 8 (372) & 8 \\
+  3NdhfPhytRbcl & 9 (123) & - & 9 \\
+  2NdhfRpoc & 9 (954) & 9 (484) & 9 \\
+  3NdhfRbclRpoc & 13 (1000 & - & $\geq$ 10 \\
+  3NdhfPhytIts & 13 (1000) & - & $\geq$ 11 \\
+  
+\end{tabular}
+\label{detailed-results}
 \end{table}
 
 Experiments showed that in some cases PhyloSAT is able to find an optimal network but then it spends considerable time trying to prove its optimality 
@@ -789,4 +821,5 @@ This work was financially supported by the Government of Russian Federation, Gra
 \bibliographystyle{splncs}
 \bibliography{main}
 \clearpage
+
 \end{document}
