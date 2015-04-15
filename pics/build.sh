@@ -6,6 +6,8 @@ dot -Tps inp3.gv > tmp.ps
 ps2epsi tmp.ps inp3.eps
 dot -Tps ans.gv > tmp.ps
 ps2epsi tmp.ps ans.eps
+dot -Tps ans3.gv > tmp.ps
+ps2epsi tmp.ps ans3.eps
 dot -Tps inp_dummy.gv > tmp.ps
 ps2epsi tmp.ps inp_dummy.eps
 dot -Tps ans_dummy.gv > tmp.ps

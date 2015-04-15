@@ -1,4 +1,4 @@
-\documentclass[runningheads, envcountsame, a4paper]{llncs}
+	\documentclass[runningheads, envcountsame, a4paper]{llncs}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -61,7 +61,6 @@ However, the exact algorithm PIRN$_\mathrm{C}$ has been introduced recently~\cit
 
 In this paper we introduce a new approach for exact parsimonious
 hybridization network construction from multiple input trees based on satisfiability (SAT) solvers.
-%SAT-solver is a software package designed to solve SAT problem, which consists of finding a satisfying assignment for a Boolean formula. 
 The SAT problem is known to be NP-complete~\cite{bordewich2007computing}, but state-of-the-art SAT-solvers running on modern hardware 
 are able to solve SAT instances having tens of thousands of variables and hundreds of thousands of clauses in several minutes.
 
@@ -80,6 +79,26 @@ construction process and Section 4 gives the experimental results. The paper is 
 
 \section{Definitions and Background}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=1.4in]{pics/inp1.eps}
+  ~~~
+  \includegraphics[width=1.4in]{pics/inp2.eps}
+  ~~~
+  \includegraphics[width=1.4in]{pics/inp3.eps}
+  \caption{Example of three gene trees over the set of taxa \{a, b, c, d, e\}.}
+  \label{input-example}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=1.4in]{pics/ans.eps}
+  ~~~~~~
+  \includegraphics[width=1.4in]{pics/ans3.eps}
+  \caption{Possible hybridization networks for the trees from Fig.~\ref{input-example} with two and three hybridization events respectively. Reticulation nodes are shown as boxes.}
+  \label{network-example}
+\end{figure}
+
 We define a \emph{phylogenetic tree} as a leaf-labelled tree constructed over a set of taxa. 
 Throughout this paper we assume that trees are rooted and binary.
 
@@ -97,12 +116,12 @@ to the tree $T'$.
 
 We say that hybridization network $N$ \emph{displays} phylogenetic tree $T$ 
 if we can choose the edges of reticulation nodes in such a way that after edge-contraction the obtained tree $T'$ will be 
-isomorphic to $T$. In Figure~\ref{network-example} each of the three trees is displayed in the hybridization network.
+isomorphic to $T$. In Figure~\ref{network-example} each of the three trees from Figure~\ref{input-example} is displayed in both hybridization networks.
 
 A \emph{hybridization number} of network $N$ with root $\rho$ is commonly defined as $h(N) = \sum\limits_{v \ne \rho} (d^-(v) - 1)$.
 Note that under our assumptions $h(N)$ simply equals the number of reticulation nodes.
 
-Suppose we are given a set of $K$ phylogenetic trees $T_1, T_2, \dots T_k$ over the same set of taxa. The \emph{minimal 
+Suppose we are given a set of $K$ phylogenetic trees $T_1, T_2, \dots, T_k$ over the same set of taxa. The \emph{minimal 
 hybridization network} for that set of trees is a network $N\mathrm{_{min}}$ that displays each tree and has the smallest 
 hybridization number possible. Note that there can be several networks with equal hybridization number.
 
@@ -114,35 +133,17 @@ It has been shown that even for the case of $k=2$ the construction of such a net
 \cite {bordewich2007computing}. As far as we know there exists only one algorithm for the construction of the most 
 parsimonious hybridization network~\cite{wu2013algorithm}.
 
-\begin{figure}[t]
-  \centering
-  \begin{minipage}[b]{0.59\linewidth}
-    \includegraphics[width=1in]{pics/inp1.eps}
-    ~~
-    \includegraphics[width=1in]{pics/inp2.eps}
-    ~~
-    \includegraphics[width=1in]{pics/inp3.eps}
-    \centering{\\ (a) Three gene trees over the set of taxa \\ \{a, b, c, d, e\}}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[b]{0.40\linewidth}
-    \includegraphics[width=1.3in]{pics/ans.eps}
-    \centering{\\ (b) A hybridization network for the trees from Fig.~\ref{network-example}~(a)}
-  \end{minipage}
-  \caption{An illustration of a hybridization network for three trees with two reticulation nodes. Reticulation nodes are shown as boxes.}
-  \label{network-example}
-\end{figure}
-
 \section{Algorithm}
 
 The main idea of our algorithm is to iterate over possible values of the hybridization number and to construct and solve a Boolean 
 formula that represents a hybridization network with this hybridization number.
+We implemented our algorithm in a software tool PhyloSAT which is available for download at GitHub\footnote{\url{https://github.com/ctlab/PhyloSAT}}.
 
 \subsection{Pre-processing}
 
 Before the actual Boolean formula encoding we modify the input and split it into several tasks to reduce the size 
 and the complexity of the problem. We do this according to the rules from~\cite{bonet2009efficiently}. To define these 
-rules we first need to define the term \emph{cluster}: a set of taxa $A$ is a cluster in trees $T_1, T_2, \dots T_k$ if there 
+rules we first need to define the term \emph{cluster}: a set of taxa $A$ is a cluster in trees $T_1, T_2, \dots, T_k$ if there 
 exists a node in each tree with the set of leaves of its subtree equal to the set $A$. The reduction rules are as follows:
 
 \begin{enumerate}
@@ -152,7 +153,7 @@ replace every subtree which is present in all input trees with a leaf with a new
 
 \item \textbf{Cluster reduction rule}:
 for each cluster $A$ replace the subtrees containing it with a leaf with a new label and add a new task for processing 
-which consists of deleted subtrees $T'_1, T'_2, \dots T'_k$ with leaf set $A$.
+which consists of deleted subtrees $T'_1, T'_2, \dots, T'_k$ with leaf set $A$.
 
 \end{enumerate}
 
@@ -233,8 +234,10 @@ $c_{v,u}$ is true iff $u$ is a child of a reticulation node $v$.
 
 This takes $O((n + k)^2)$ literals for specifying the network structure, and by noticing that $k < n$ we have $O(n^2)$ literals.
 
-To encode the uniqueness of parents and children we use an obvious pattern that requires $O(n^2)$ clauses for each node. For example consider 
-parent variables. We state that a node can have at least one parent and at most one parent. For parents of the regular node $v$ this can be expressed 
+To encode the uniqueness of parents and children we tried to use an obvious pairwise encoding that requires 
+$O(n^2)$ clauses for each node as well as more efficient Bimander encoding \cite{nguyenefficient}. However the Bimander encoding gave no speed boost because of the existence of other constraints that require $O(n^2)$ clauses per node.
+Thus we will describe the pairwise encoding for simplicity.
+For example consider parent variables. We state that a node can have at least one parent and at most one parent. For parents of the regular node $v$ this can be expressed 
 in the following way: 
 $$\left(\bigvee\limits_{u \in PP(v)} p_{v,u}\right) \wedge \left(\bigwedge\limits_{i, j \in PP(v);i < j} \left(p_{v,i} \rightarrow \neg p_{v,j}\right)\right).$$
 
@@ -318,57 +321,57 @@ They are listed in section 5 of Table~\ref{network-table}.
   \hline
   6.1 &
   $l_{v,u} \rightarrow p_{u,v}$ &
-  $v \in V; u \in V; u \in PC(v)$
+  $v \in V; u \in V \cap PC(v)$
   \\
   6.2 &
   $r_{v,u} \rightarrow p_{u,v}$ &
-  $v \in V; u \in V; u \in PC(v)$
+  $v \in V; u \in V \cap PC(v)$
   \\
   6.3 &
   $p_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
-  $v \in V; u \in V; u \in PC(v)$
+  $v \in V; u \in V \cap PC(v)$
   \\
   
   \hline
   7.1 &
   $l_{v,u} \rightarrow (p^l_{u,v} \vee p^r_{u,v})$ &
-  $v \in V; u \in R; u \in PC(v)$
+  $v \in V; u \in R \cap PC(v)$
   \\
   7.2 &
   $r_{v,u} \rightarrow (p^l_{u,v} \vee p^r_{u,v})$ &
-  $v \in V; u \in R; u \in PC(v)$
+  $v \in V; u \in R \cap PC(v)$
   \\
   7.3 &
   $p^l_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
-  $v \in V; u \in R; u \in PC(v)$
+  $v \in V; u \in R \cap PC(v)$
   \\
   7.4 &
   $p^r_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
-  $v \in V; u \in R; u \in PC(v)$
+  $v \in V; u \in R \cap PC(v)$
   \\
   
   \hline 
   8.1 &
   $c_{v,u} \rightarrow p_{u,v}$ &
-  $v \in R; u \in V; u \in PC(v)$
+  $v \in R; u \in V \cap PC(v)$
   \\
   8.2 &
   $p_{u,v} \rightarrow c_{v,u}$ &
-  $v \in R; u \in V; u \in PC(v)$
+  $v \in R; u \in V \cap PC(v)$
   \\
   
   \hline
   9.1 &
   $c_{v,u} \rightarrow (p^l_{u,v} \vee p^r_{u,v})$ &
-  $v \in R; u \in R; u \in PC(v)$
+  $v \in R; u \in R \cap PC(v)$
   \\
   9.2 &
   $p^l_{u,v} \rightarrow c_{v,u}$ &
-  $v \in R; u \in R; u \in PC(v)$
+  $v \in R; u \in R \cap PC(v)$
   \\
   9.3 &
   $p^r_{u,v} \rightarrow c_{v,u}$ &
-  $v \in R; u \in R; u \in PC(v)$
+  $v \in R; u \in R \cap PC(v)$
   \\
   
   \hline
@@ -555,148 +558,150 @@ These clauses are listed in section 1 of Table~\ref{child-parent-table}.
 \begin{table}[t]
 \centering
 \caption{Clauses for translating child-parent relations from the trees to the network.}
+\resizebox{\linewidth}{!}{
 \begin{tabular}{l | l | l}
   & Clause & Range \\
 
   \hline
   1.1 &
   $(p_{v,u} \wedge u_{t,u}) \rightarrow a_{t,v,u}$ &
-  $t \in T; v \in V \cup L; u \in PP(v); u \in V$
+  $t \in T; v \in V \cup L; u \in V \cap PP(v)$
   \\
     
   1.2 &
   $(p_{v,u} \wedge a_{t,v,u}) \rightarrow u_{t,u}$  &
-  $t \in T; v \in V \cup L; u \in PP(v); u \in V$
+  $t \in T; v \in V \cup L; u \in V \cap PP(v)$
   \\
    
   1.3 &
   $(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T; v \in V \cup L; u \in PP(v); u \in V; w \in PP(u)$
+  $t \in T; v \in V \cup L; u \in V \cap PP(v); w \in PP(u)$
   \\
     
   1.4 &
   $(p_{v,u} \wedge \neg u_{t,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T; v \in V \cup L; u \in PP(v); u \in V; w \in PP(u)$
+  $t \in T; v \in V \cup L; u \in V \cap PP(v); w \in PP(u)$
   \\
 
   \hline
   2.1 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T; v \in R; u \in PP(v); u \in R; w \in PU(u)$
+  $t \in T; v \in R; u \in R \cap PP(v); w \in PU(u)$
   \\
 
   2.2 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T; v \in R; u \in PP(v); u \in R; w \in PU(u)$
+  $t \in T; v \in R; u \in R \cap PP(v); w \in PU(u)$
   \\
     
   2.3 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T; v \in R; u \in PP(v); u \in R; w \in PU(u)$
+  $t \in T; v \in R; u \in R \cap PP(v); w \in PU(u)$
   \\
   
   2.4 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T; v \in R; u \in PP(v); u \in R; w \in PU(u)$
+  $t \in T; v \in R; u \in R \cap PP(v); w \in PU(u)$
   \\
   
   2.5 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge u_{t,u}) \rightarrow a_{t,v,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in V$
+  $t \in T; v \in R; u \in V \cap PP(v)$
   \\
   
   2.6 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge u_{t,u}) \rightarrow a_{t,v,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in V$
+  $t \in T; v \in R; u \in V \cap PP(v)$
   \\
   
   2.7 & 
   $(p^l_{v,u} \wedge d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T; v \in R; u \in PP(v); u \in V; w \in PU(u)$
+  $t \in T; v \in R; u \in V \cap PP(v); w \in PU(u)$
   \\
  
   2.8 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T; v \in R; u \in PP(v); u \in V; w \in PU(u)$
+  $t \in T; v \in R; u \in V \cap PP(v); w \in PU(u)$
   \\
   
   2.9 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T; v \in R; u \in PP(v); u \in V; w \in PU(u)$
+  $t \in T; v \in R; u \in V \cap PP(v); w \in PU(u)$
   \\
   
   2.10 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge \neg u_{t,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T; v \in R; u \in PP(v); u \in V; w \in PU(u)$
+  $t \in T; v \in R; u \in V \cap PP(v); w \in PU(u)$
   \\
    
   \hline
   3.1 &
   $(p^l_{v,u} \wedge \neg d_{t,v}) \rightarrow \neg u^r_{t,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in R$
+  $t \in T; v \in R; u \in R \cap PP(v)$
   \\
 
   3.2 &
   $(p^r_{v,u} \wedge d_{t,v}) \rightarrow \neg u^r_{t,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in R$
+  $t \in T; v \in R; u \in R \cap PP(v)$
   \\
 
   3.3 &
   $(p^l_{v,u} \wedge \neg d_{t,v}) \rightarrow \neg u_{t,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in V$
+  $t \in T; v \in R; u \in V \cap PP(v)$
   \\
   
   3.4 & 
   $(p^r_{v,u} \wedge d_{t,v}) \rightarrow \neg u_{t,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in V$
+  $t \in T; v \in R; u \in V \cap PP(v)$
   \\
 
   \hline
   4.1 &
   $(p^l_{v,u} \wedge d_{t,v} \wedge u^r_{t,v}) \rightarrow u^r_{t,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in R$
+  $t \in T; v \in R; u \in R \cap PP(v)$
   \\
 
   4.2 &
   $(p^r_{v,u} \wedge \neg d_{t,v} \wedge u^r_{t,v}) \rightarrow u^r_{t,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in R$
+  $t \in T; v \in R; u \in R \cap PP(v)$
   \\
 
   4.3 &
   $\neg u^r_{t,v} \rightarrow \neg u^r_{t,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in R$
+  $t \in T; v \in R; u \in R \cap PP(v)$
   \\
   
   4.4 &
   $\neg u^r_{t,v} \rightarrow \neg u_{t,u}$ &
-  $t \in T; v \in R; u \in PP(v); u \in V$
+  $t \in T; v \in R; u \in V \cap PP(v)$
   \\
 
   4.5 &
   $c_{v,u} \rightarrow u^r_{t,v}$ &
-  $t \in T; v \in R; u \in PC(v); u \in V \cup L$
+  $t \in T; v \in R; u \in \left(V \cup L\right) \cap PC(v)$
   \\
 
   \hline
   5.1 &
   $p_{v,u} \rightarrow \neg a_{t,u,w}$ &
-  $t \in T; v \in V \cup L; u \in PP(v); u \in R;$
+  $t \in T; v \in V \cup L; u \in R \cap PP(v)$
   \\ & & $w \in PU(u): w \leq v$
   \\
   
   5.2 &
   $(p_{v,u} \wedge a_{t,u,w}) \rightarrow a_{t,v,w}$ &
-  $t \in T; v \in V \cup L; u \in PP(v); u \in R;$
+  $t \in T; v \in V \cup L; u \in R \cap PP(v);$
   \\ & & $w \in PU(u): w > v$
   \\
   
   5.3 &
   $(p_{v,u} \wedge a_{t,v,w}) \rightarrow a_{t,u,w}$ &
-  $t \in T; v \in V \cup L; u \in PP(v); u \in R;$
+  $t \in T; v \in V \cup L; u \in R \cap PP(v);$
   \\ & & $w \in PU(u): w > v$
   \\
 
 \end{tabular}
+}
 \label{child-parent-table}
 \end{table}
 
@@ -721,7 +726,7 @@ each node for each tree, so we have $O(tn^3)$ clauses to map trees to the networ
 
 \subsection{Solving the Boolean formula and post-processing}
 
-To solve the generated Boolean formula we use a SAT-solver CryptoMiniSat 4.2.0 (\url{http://www.msoos.org/cryptominisat4/}).
+To solve the generated Boolean formula we use a SAT-solver CryptoMiniSat\footnote[1]{\url{http://www.msoos.org/cryptominisat4/}}.
 Choosing the most appropriate solver is not considered in this paper, however several experimentations were made by 
 M. Bonet and K. John~\cite{bonet2009efficiently} so it is one of the topics of further research.
 
@@ -744,7 +749,7 @@ on 5 test cases and was significantly slower on 2 test cases. Twelve more test c
 was able to produce some (possibly non-optimal) network. PIRN$\mathrm{_{CH}}$ did not solve 3 of these 12 cases in time, in 3 cases 
 produced less optimal network than PhyloSAT, in 2 cases more optimal and in the rest 4 cases results were equal. From these 12 cases PIRN$\mathrm{_{CH}}$
 produced an optimal network for only 2, and PhyloSAT found an optimal network for 4 cases but was unable to prove their optimality. 
-8 more test cases had equal trees in input, so they had an obvious answer.
+8 more test cases had isomorphic trees in input, so they had an obvious answer.
 Results of the simulation are summarized in Table~\ref{exp-results-table}.
 
 \begin{table}[t]
@@ -771,7 +776,6 @@ Thus, a close upper bound for the minimal hybridization number will also be usef
 \section{Conclusion}
 
 We have proposed an algorithm for constructing an exact parsimonious hybridization network from multiple phylogenetic trees.
-An implementation of our algorithm is available for download at \url{https://github.com/ctlab/PhyloSAT}.
 Experiments showed that PhyloSAT outperforms PIRN$\mathrm{_C}$ in all cases and performs reasonably well comparing 
 to the heuristic PIRN$\mathrm{_{CH}}$. 
 However in the cases of large hybridization numbers search and construction of optimal network is still a very challenging problem. 
@@ -780,7 +784,7 @@ limit search bounds and thus reduce the running time of our algorithm.
 
 \section*{Acknowledgements}
 
-This work was financially supported by the Government of Russian Federation, Grant 074-U01. Authors would like to thank Igor Buzhinsky and Daniil Chivilikhin for helpful comments and conversations.
+This work was financially supported by the Government of Russian Federation, Grant 074-U01. Authors would like to thank Igor Buzhinsky, Daniil Chivilikhin and Fedor Tsarev for helpful comments and conversations.
 
 \bibliographystyle{splncs}
 \bibliography{main}
