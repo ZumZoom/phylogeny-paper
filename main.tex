@@ -14,8 +14,6 @@
 
 \usepackage{arydshln}
 
-%\newcommand\multibrace[3]{\rdelim\}{#1}{3mm}[\pbox{#2}{#3}]}
-
 \setlength\dashlinedash{0.3pt}
 \setlength\dashlinegap{1.5pt}
 \setlength\arrayrulewidth{0.4pt}
@@ -23,7 +21,7 @@
 \begin{document}
 \mainmatter           
 \title{Constructing Parsimonious Hybridization Networks from Multiple Phylogenetic Trees Using a SAT-solver}
-\titlerunning{ } 
+\titlerunning{Constructing Parsimonious Hybridization Networks Using a SAT-solver} 
 \toctitle{ }
 
 \author{Vladimir Ulyantsev \and Mikhail Melnik}
@@ -532,7 +530,7 @@ note that $x_{t,v_t,v}$ implies $u_{t,v}$ by definition. See section 3 of Table~
   $\neg x_{t,v_t,v} \vee \neg x_{t',v_{t'},v}$ &
   $t, t' \in T; v \in V; v_t \in V(t); v_{t'} \in V(t') :$
   \\
-  & & subtrees of $t$ and $t'$ have disjoint sets of taxa
+  & & \quad subtrees of $t$ and $t'$ have disjoint sets of taxa
   
 \end{tabular}
 \label{mapping-table}
