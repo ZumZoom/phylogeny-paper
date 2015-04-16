@@ -9,6 +9,7 @@
 \usepackage{verbatim}
 \usepackage[caption=false]{subfig}
 \usepackage{cite}
+\usepackage{multirow}
 
 \begin{document}
 \mainmatter           
@@ -321,15 +322,15 @@ They are listed in section 5 of Table~\ref{network-table}.
   \hline
   6.1 &
   $l_{v,u} \rightarrow p_{u,v}$ &
-  $v \in V; u \in V \cap PC(v)$
+  \multirow{3}{*}{$v \in V; u \in V \cap PC(v)$}
   \\
   6.2 &
   $r_{v,u} \rightarrow p_{u,v}$ &
-  $v \in V; u \in V \cap PC(v)$
+  %$v \in V; u \in V \cap PC(v)$
   \\
   6.3 &
   $p_{u,v} \rightarrow (l_{v,u} \vee r_{v,u})$ &
-  $v \in V; u \in V \cap PC(v)$
+  %$v \in V; u \in V \cap PC(v)$
   \\
   
   \hline
@@ -429,7 +430,7 @@ In Figure~\ref{mapping-example} node $u$ is the parent of all the nodes starting
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=1.3in]{pics/up_var.eps}
+  \includegraphics[width=1in]{pics/up_var.eps}
   \caption{An illustration of a piece of mapping of the nodes from the tree (on the left) to the nodes from the network (on the right). 
   Nodes that are injectively mapped are connected by a dotted line. When displaying the tree all the edges in the path from $u$ to $v$
   will be contracted to the single edge form $u_t$ to $v_t$.}
@@ -726,7 +727,7 @@ each node for each tree, so we have $O(tn^3)$ clauses to map trees to the networ
 
 \subsection{Solving the Boolean formula and post-processing}
 
-To solve the generated Boolean formula we use a SAT-solver CryptoMiniSat\footnote[1]{\url{http://www.msoos.org/cryptominisat4/}}.
+To solve the generated Boolean formula we use a SAT-solver CryptoMiniSat\footnote{\url{http://www.msoos.org/cryptominisat4/}}.
 Choosing the most appropriate solver is not considered in this paper, however several experimentations were made by 
 M. Bonet and K. John~\cite{bonet2009efficiently} so it is one of the topics of further research.
 
@@ -792,7 +793,7 @@ The results of PIRN$\mathrm{_{C}}$ are not included because it did not manage to
   2PhytIts & 8 (41) & 8 (372) & 8 \\
   3NdhfPhytRbcl & 9 (123) & - & 9 \\
   2NdhfRpoc & 9 (954) & 9 (484) & 9 \\
-  3NdhfRbclRpoc & 13 (1000 & - & $\geq$ 10 \\
+  3NdhfRbclRpoc & 13 (1000) & - & $\geq$ 10 \\
   3NdhfPhytIts & 13 (1000) & - & $\geq$ 11 \\
   
 \end{tabular}
