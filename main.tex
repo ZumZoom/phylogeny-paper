@@ -11,7 +11,6 @@
 \usepackage{cite}
 \usepackage{multirow}
 \usepackage{url}
-
 \usepackage{arydshln}
 
 \setlength\dashlinedash{0.3pt}
@@ -195,7 +194,7 @@ We decrease $k$ until the solver cannot satisfy the formula, and this means that
 lowest possible.
 
 There are other strategies of searching the minimal value of $k$. For example, we can start from 
-zero and increase the value of $k$ until the solver will be able to satisfy the formula, or we can use binary search. 
+zero and increase the value of $k$ until the solver will be able to satisfy the formula, or we can use the binary search. 
 The results of the binary search were close to the ones of downwards method, 
 but in some cases, when the binary search tried to satisfy formulae with values of $k$ less than minimal possible hybridization number, 
 its results were also poor. 
@@ -273,19 +272,21 @@ They are listed in section 5 of Table~\ref{network-table}.
   \hline
   2.1 &
   $l_{v,u_1} \vee \dots \vee l_{v,u_k}$ &
-  $v \in V; u_1 \dots u_k \in PC(v)$
+  \multirow{2}{*}{$v \in V; u_1 \dots u_k \in PC(v)$}
   \\
   2.2 &
-  $l_{v,u} \rightarrow \neg l_{v,w}$ &
-  $v \in V; u, w \in PC(v)$
-  \\
-  2.3 &
   $r_{v,u_1} \vee \dots \vee r_{v,u_k}$ &
-  $v \in V; u_1 \dots u_k \in PC(v)$
+%  $v \in V; u_1 \dots u_k \in PC(v)$
+  \\
+  \hdashline
+  
+  2.3 &
+  $l_{v,u} \rightarrow \neg l_{v,w}$ &
+  \multirow{2}{*}{$v \in V; u, w \in PC(v)$}
   \\
   2.4 &
   $r_{v,u} \rightarrow \neg r_{v,w}$ &
-  $v \in V; u, w \in PC(v)$
+%  $v \in V; u, w \in PC(v)$
   \\
   
   \hline
@@ -301,19 +302,21 @@ They are listed in section 5 of Table~\ref{network-table}.
   \hline
   4.1 &
   $p^l_{v,u_1} \vee \dots \vee p^l_{v,u_k}$ &
-  $v \in R; u_1 \dots u_k \in PP(v)$
+  \multirow{2}{*}{$v \in R; u_1 \dots u_k \in PP(v)$}
   \\
   4.2 &
-  $p^l_{v,u} \rightarrow \neg p^l_{v,w}$ &
-  $v \in R; u, w \in PP(v)$
-  \\
-  4.3 &
   $p^r_{v,u_1} \vee \dots \vee p^r_{v,u_k}$ &
-  $v \in R; u_1 \dots u_k \in PP(v)$
+%  $v \in R; u_1 \dots u_k \in PP(v)$
+  \\
+  \hdashline
+  
+  4.3 &
+  $p^l_{v,u} \rightarrow \neg p^l_{v,w}$ &
+  \multirow{2}{*}{$v \in R; u, w \in PP(v)$}
   \\
   4.4 &
   $p^r_{v,u} \rightarrow \neg p^r_{v,w}$ &
-  $v \in R; u, w \in PP(v)$
+%  $v \in R; u, w \in PP(v)$
   \\
 
   \hline
@@ -437,7 +440,7 @@ In Figure~\ref{mapping-example} node $u$ is the parent of all the nodes starting
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=1in]{pics/up_var.eps}
+  \includegraphics[width=1.3in]{pics/up_var.eps}
   \caption{An illustration of a piece of mapping of the nodes from the tree (on the left) to the nodes from the network (on the right). 
   Nodes that are injectively mapped are connected by a dotted line. When displaying the tree all the edges in the path from $u$ to $v$
   will be contracted to the single edge form $u_t$ to $v_t$.}
@@ -453,6 +456,16 @@ most one node from the network corresponds to the tree node. These clauses are d
 Because of dummy roots we know that roots of input trees 
 are mapped to the root of the network so we have $x_{t,\rho_t,\rho}$ set to true for every tree. Also 
 note that $x_{t,v_t,v}$ implies $u_{t,v}$ by definition. See section 3 of Table~\ref{mapping-table} for these clauses.
+
+Furthermore, if we know that node $v$ is a leaf and its parent $u$ corresponds to node $u_t$ from tree $t$, 
+then we can conclude that $a_{t,v,u}$ is true i.e. $u$ is the direct parent of $v$ in tree $t$. The same observation 
+can be done for non-leaves, i.e. if we know that $v$ corresponds to $v_t$ and another node $u$ corresponds to $u_t$ 
+and $u_t$ is parent of $v_t$ then $u$ is the direct parent of $v$ considering tree $t$. On the other hand if we know 
+that $v$ corresponds to $v_t$ and we know that $u$ is the direct parent of $v$ considering tree $t$, then $u$ should 
+correspond to parent of $v_t$. We also should take care of enumeration, so we add a constraint stating that if node 
+$u_t$ is the parent of the node $v_t$, then the number of the corresponding node $u$ should be greater than the one of 
+the node $v$, i.e. $x_{t,v_t,v} \rightarrow \neg x_{t,u_t,u}$ for each $u$ and $v$ such that $u < v$. These clauses are
+presented in section 4 of Table~\ref{mapping-table}.
 
 \begin{table}[t]
 \centering
@@ -499,16 +512,18 @@ note that $x_{t,v_t,v}$ implies $u_{t,v}$ by definition. See section 3 of Table~
   $x_{t,u_t,u} \rightarrow a_{t,v,u}$ &
   $t \in T; v \in L; u \in PP(v); u_t \in V(t)$
   \\
+  \hdashline
   
   4.2 &
   $(x_{t,v_t,v} \wedge x_{t,u_t,u}) \rightarrow a_{t,v,u}$ &
-  $t \in T; v \in V; u \in PP(v); v_t \in V(t): u_t = p(v_t)$
+  \multirow{2}{*}{$t \in T; v \in V; u \in PP(v); v_t \in V(t): u_t = p(v_t)$}
   \\
   
   4.3 &
   $(x_{t,v_t,v} \wedge a_{t,v,u}) \rightarrow x_{t,u_t,u}$ &
-  $t \in T; v \in V; u \in PP(v); v_t \in V(t): u_t = p(v_t)$
+%  $t \in T; v \in V; u \in PP(v); v_t \in V(t): u_t = p(v_t)$
   \\
+  \hdashline
 
   4.4 &
   $x_{t,v_t,v} \rightarrow \neg x_{t,u_t,u}$ &
@@ -535,16 +550,6 @@ note that $x_{t,v_t,v}$ implies $u_{t,v}$ by definition. See section 3 of Table~
 \end{tabular}
 \label{mapping-table}
 \end{table}
-
-Furthermore, if we know that node $v$ is a leaf and its parent $u$ corresponds to node $u_t$ from tree $t$, 
-then we can conclude that $a_{t,v,u}$ is true i.e. $u$ is the direct parent of $v$ in tree $t$. The same observation 
-can be done for non-leaves, i.e. if we know that $v$ corresponds to $v_t$ and another node $u$ corresponds to $u_t$ 
-and $u_t$ is parent of $v_t$ then $u$ is the direct parent of $v$ considering tree $t$. On the other hand if we know 
-that $v$ corresponds to $v_t$ and we know that $u$ is the direct parent of $v$ considering tree $t$, then $u$ should 
-correspond to parent of $v_t$. We also should take care of enumeration, so we add a constraint stating that if node 
-$u_t$ is the parent of the node $v_t$, then the number of the corresponding node $u$ should be greater than the one of 
-the node $v$, i.e. $x_{t,v_t,v} \rightarrow \neg x_{t,u_t,u}$ for each $u$ and $v$ such that $u < v$. These clauses are
-presented in section 4 of Table~\ref{mapping-table}.
 
 We also add some heuristic constraints related to the trees' structure. Notice that the number of the node in the network 
 cannot be less than the  size of the subtree of the corresponding node $v_t$ in tree $t$ and also it cannot be greater than 
@@ -831,7 +836,7 @@ limit search bounds and thus reduce the running time of our algorithm.
 
 This work was financially supported by the Government of Russian Federation, Grant 074-U01. Authors would like to thank Igor Buzhinsky, Daniil Chivilikhin and Fedor Tsarev for helpful comments and conversations.
 
-\bibliographystyle{splncs}
+\bibliographystyle{splncs03}
 \bibliography{main}
 \clearpage
 
