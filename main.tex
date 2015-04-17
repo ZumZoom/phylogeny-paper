@@ -36,7 +36,7 @@
   We present an exact algorithm for constructing minimal hybridization networks from multiple trees 
   which is based on reducing 
   the problem to the Boolean satisfiability problem. The main idea of our algorithm is to iterate over
-  possible hybridization numbers and to construct for each of them a Boolean formula that is satisfiable iff there
+  possible hybridization numbers and to construct a Boolean formula for each of them that is satisfiable iff there
   exists a network with such hybridization number. The proposed algorithm is implemented in a software tool PhyloSAT.
   The experimental evaluation of our algorithm on biological data shows that our method is as far as we know the 
   fastest exact algorithm for the minimal hybridization network construction problem.
@@ -48,7 +48,7 @@
 
 A phylogenetic network is a powerful model for reticulate
 evolutionary processes (such as horizontal gene transfer and hybrid specification).
-Briefly, a phylogenetic network is a directed acyclic graph which has
+Briefly, a phylogenetic network is the directed acyclic graph which has
 nodes (called reticulation nodes) with more than one incoming edge. Phylogenetic
 networks have been studied by several researchers~\cite{huson2010phylogenetic, morrison2011introduction, 
 nakhleh2011evolutionary}. There are several formulations of phylogenetic network
@@ -56,7 +56,7 @@ construction problem with various modelling assumptions and different types of i
 In this paper we focus on the specific type of phylogenetic networks called hybridization
 networks~\cite{semple2006hybridization, chen2010hybridnet}.
 
-As input data for hybridization network construction we consider a set of gene trees on the same set of taxa.
+We consider a set of gene trees on the same set of taxa as input data for hybridization network construction.
 Each gene tree models the evolutionary history of some gene. 
 Due to reticulate evolutionary events, these trees can have different topologies.
 The aim is to construct a hybridization network containing the smallest possible number of 
@@ -64,9 +64,9 @@ reticulation nodes and displaying each of the input trees.
 
 Most of the algorithms for hybridization network construction are heuristic~\cite{wu2013algorithm, park2012murpar} 
 and usually deal with only two trees.
-However, the exact algorithm PIRN$_\mathrm{C}$ has been introduced recently~\cite{wu2013algorithm}, which is able to process more than two input trees.
+However, the exact algorithm PIRN$_\mathrm{C}$ which is able to process more than two input trees has been introduced recently~\cite{wu2013algorithm}.
 
-In this paper we introduce a new approach for exact parsimonious
+In this paper we introduce a new approach to exact parsimonious
 hybridization network construction from multiple input trees based on satisfiability (SAT) solvers.
 The SAT problem is known to be NP-complete~\cite{bordewich2007computing}, but state-of-the-art SAT-solvers running on modern hardware 
 are able to solve SAT instances having tens of thousands of variables and hundreds of thousands of clauses in several minutes.
@@ -79,7 +79,7 @@ The general outline of our approach is to convert an instance of hybridization n
 problem to an instance of the SAT problem (a Boolean formula), solve it using a SAT-solver and then if the
 solution exists convert 
 the satisfying assignment into the hybridization network.
-Our approach leads to an exact algorithm that outperforms PIRN$\mathrm{_C}$ on our tests.
+Our approach leads to the exact algorithm that outperforms PIRN$\mathrm{_C}$ on our tests.
 
 The paper is structured as follows. Section 2 gives the formal definitions, Section 3 describes the Boolean formula
 construction process and Section 4 gives the experimental results. The paper is concluded in Section 5.
@@ -118,7 +118,7 @@ of three or more to a sequence of reticulation nodes with in-degrees of two~\cit
 tree nodes.
 
 Every hybridization network $N$ can be reduced to a tree. To do this we firstly keep only one of the incoming edges for each reticulation node in $N$. 
-And secondly we contract edges to remove any node $v$ such that $d^-(v) = d^+(v) = 1$. With these two steps we reduce the network $N$ 
+Secondly, we contract edges to remove any node $v$ such that $d^-(v) = d^+(v) = 1$. By these two steps we reduce the network $N$ 
 to the tree $T'$.
 
 We say that hybridization network $N$ \emph{displays} phylogenetic tree $T$ 
@@ -164,7 +164,7 @@ which consists of deleted subtrees $T'_1, T'_2, \dots, T'_k$ with leaf set $A$.
 
 \end{enumerate}
 
-After we split the task into a set of simpler tasks, we add a dummy root to each tree of each task along with 
+After splitting the task into a set of simpler tasks, we add a dummy root to each tree of each task along with 
 the new dummy leaf for tree consistency. Figure~\ref{dummy-example} illustrates the procedure. 
 This is done to ensure that all the trees in the input share a common root. 
 This dummy root will be deleted on the post-processing stage. At this stage we have a set of tasks that will be solved 
@@ -242,7 +242,7 @@ $c_{v,u}$ is true iff $u$ is a child of a reticulation node $v$.
 This takes $O((n + k)^2)$ literals for specifying the network structure, and by noticing that $k < n$ we have $O(n^2)$ literals.
 
 To encode the uniqueness of parents and children we tried to use an obvious pairwise encoding that requires 
-$O(n^2)$ clauses for each node as well as more efficient Bimander encoding \cite{nguyenefficient}. However the Bimander encoding gave no speed boost because of the existence of other constraints that require $O(n^2)$ clauses per node.
+$O(n^2)$ clauses for each node as well as more efficient Bimander encoding \cite{nguyenefficient}. However, the Bimander encoding gave no speed boost because of the existence of other constraints that require $O(n^2)$ clauses per node.
 Thus we will describe the pairwise encoding for simplicity.
 For example consider parent variables. We state that a node can have at least one parent and at most one parent. For parents of the regular node $v$ this can be expressed 
 in the following way: 
@@ -454,7 +454,7 @@ First, we define at-least-one and at-most-one constraints for literals $x$ and $
 of $x$ literals we have a restriction that at most one node from the tree corresponds to the network node, and that at 
 most one node from the network corresponds to the tree node. These clauses are defined in sections 1--2 of Table~\ref{mapping-table}.
 Because of dummy roots we know that roots of input trees 
-are mapped to the root of the network so we have $x_{t,\rho_t,\rho}$ set to true for every tree. Also 
+are mapped to the root of the network so we have $x_{t,\rho_t,\rho}$ set to be true for every tree. Also 
 note that $x_{t,v_t,v}$ implies $u_{t,v}$ by definition. See section 3 of Table~\ref{mapping-table} for these clauses.
 
 Furthermore, if we know that node $v$ is a leaf and its parent $u$ corresponds to node $u_t$ from tree $t$, 
@@ -745,7 +745,7 @@ each node for each tree, so we have $O(tn^3)$ clauses to map trees to the networ
 \subsection{Solving the Boolean formula and post-processing}
 
 To solve the generated Boolean formula we use a SAT-solver CryptoMiniSat\footnote{\url{http://www.msoos.org/cryptominisat4/}}.
-Choosing the most appropriate solver is not considered in this paper, however several experimentations were made by 
+Choosing the most appropriate solver is not considered in this paper, however, several experimentations were made by 
 M. Bonet and K. John~\cite{bonet2009efficiently} so it is one of the topics of further research.
 
 After solving a task we reconstruct the network from the SAT-solver output. After that we delete the dummy root and the corresponding 
@@ -761,7 +761,7 @@ on the same test cases.
 Out of 57 test cases, 9 were not solved even by heuristic algorithms in time. PhyloSAT was able to produce the optimal answer for 28
 test cases. From these 28 test cases PIRN$\mathrm{_C}$ was able to solve only 21 and in all of them hybridization number was less than 6
 which shows that PIRN$\mathrm{_C}$ is not capable of building hybridization networks with large hybridization number.
-On all test cases PIRN$\mathrm{_C}$ was slower than PhyloSAT.
+In all test cases PIRN$\mathrm{_C}$ was slower than PhyloSAT.
 Even PIRN$\mathrm{_{CH}}$ did not solve 2 of these 28 test cases in time. PIRN$\mathrm{_{CH}}$ was faster than PhyloSAT only
 on 5 test cases and was significantly slower on 2 test cases. Twelve more test cases were not solved by PIRN$\mathrm{_C}$, but PhyloSAT
 was able to produce some (possibly non-optimal) network. PIRN$\mathrm{_{CH}}$ did not solve 3 of these 12 cases in time, in 3 cases 
@@ -769,7 +769,7 @@ produced less optimal network than PhyloSAT, in 2 cases more optimal and in the 
 produced an optimal network for only 2, and PhyloSAT found an optimal network for 3 cases but was unable to prove their optimality. 
 8 more test cases had isomorphic trees in input, so they had an obvious answer of zero.
 Results of the simulation are summarized in Table~\ref{exp-results-table}.
-Also the more precise results of comparison are in Table~\ref{detailed-results}. We included only cases with hybridization number more than 6, because on less complicated tests results of all the algorithms were similar.
+Also, the more precise results of comparison are in Table~\ref{detailed-results}. We included only cases with hybridization number more than 6, because on less complicated tests results of all the algorithms were similar.
 The results of PIRN$\mathrm{_{C}}$ are not included because it did not manage to solve any of these cases. 
 
 \begin{table}[t]
@@ -819,7 +819,7 @@ The results of PIRN$\mathrm{_{C}}$ are not included because it did not manage to
 
 Experiments showed that in some cases PhyloSAT is able to find an optimal network but then it spends considerable time trying to prove its optimality 
 and that time is much higher than reasonable limit. We can avoid wasting time on useless computation 
-in cases when we find a network with hybridization number equal to the heuristic lower bound (like PIRN$\mathrm{_{CH}}$ does). Besides we found 
+in cases when we find a network with hybridization number equal to the heuristic lower bound (like PIRN$\mathrm{_{CH}}$ does). Besides, we found 
 that it also costs much time to build a network with a big hybridization number when the minimal hybridization number is small. 
 Thus, a close upper bound for the minimal hybridization number will also be useful and will save much computation time.
 
@@ -828,7 +828,7 @@ Thus, a close upper bound for the minimal hybridization number will also be usef
 We have proposed an algorithm for constructing an exact parsimonious hybridization network from multiple phylogenetic trees.
 Experiments showed that PhyloSAT outperforms PIRN$\mathrm{_C}$ in all cases and performs reasonably well comparing 
 to the heuristic PIRN$\mathrm{_{CH}}$. 
-However in the cases of large hybridization numbers search and construction of optimal network is still a very challenging problem. 
+However, in the cases of large hybridization numbers search and construction of optimal network is still a very challenging problem. 
 In the future we plan to use existing heuristics and estimations on lower and upper bounds of the hybridization number to 
 limit search bounds and thus reduce the running time of our algorithm.
 
