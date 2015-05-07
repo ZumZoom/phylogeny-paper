@@ -62,13 +62,13 @@ Due to reticulate evolutionary events, these trees can have different topologies
 The aim is to construct a hybridization network containing the smallest possible number of 
 reticulation nodes and displaying each of the input trees. 
 
-Most of the algorithms for hybridization network construction are heuristic~\cite{wu2013algorithm, park2012murpar} 
+Most of the algorithms for hybridization network construction are heuristic~\cite{wu2010close, park2012murpar} 
 and usually deal with only two trees.
 However, the exact algorithm PIRN$_\mathrm{C}$ which is able to process more than two input trees has been introduced recently~\cite{wu2013algorithm}.
 
 In this paper we introduce a new approach to exact parsimonious
 hybridization network construction from multiple input trees based on satisfiability (SAT) solvers.
-The SAT problem is known to be NP-complete~\cite{bordewich2007computing}, but state-of-the-art SAT-solvers running on modern hardware 
+The SAT problem is known to be NP-complete, but state-of-the-art SAT-solvers running on modern hardware 
 are able to solve SAT instances having tens of thousands of variables and hundreds of thousands of clauses in several minutes.
 
 SAT-solver based algorithms have been successfully applied to efficiently calculate evolutionary tree measures~\cite{bonet2009efficiently}
@@ -476,11 +476,11 @@ presented in section 4 of Table~\ref{mapping-table}.
   \hline
   1.1 &
   $a_{t,v,u_1} \vee \dots \vee a_{t,v,u_k}$ &
-  $v \in V \cup L \cup R; u_1 \dots u_k \in PU(v)$
+  $t \in T; v \in V \cup L \cup R; u_1 \dots u_k \in PU(v)$
   \\
   1.2 &
   $a_{t,v,u} \rightarrow \neg a_{t,v,w}$ &
-  $v \in V \cup L \cup R; u, w \in PU(v)$
+  $t \in T; v \in V \cup L \cup R; u, w \in PU(v)$
   \\
   
   \hline
