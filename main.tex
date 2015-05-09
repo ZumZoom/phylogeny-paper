@@ -415,7 +415,7 @@ the network nodes.
 \begin{enumerate}
 
 \item $x_{t,v_t,v}$ for each $t \in T, v_t \in V(t), v \in V$ :
-$x_{t,s,v}$ is true iff regular node $v$ represents node $v_t$ from tree $t$, i.e. $x$ literals represent injective 
+$x_{t,v_t,v}$ is true iff regular node $v$ represents node $v_t$ from tree $t$, i.e. $x$ literals represent injective 
 mapping of network nodes to tree nodes. An example of such mapping is shown in Figure~\ref{mapping-example}.
 Note that leaves of the trees are bijectively mapped to leaves of the network thus there is no need to introduce $x$ variables for them.
 
@@ -510,22 +510,27 @@ presented in section 4 of Table~\ref{mapping-table}.
   \hline
   4.1 &
   $x_{t,u_t,u} \rightarrow a_{t,v,u}$ &
-  $t \in T; v \in L; u \in PP(v); u_t \in V(t)$
+  \multirow{2}{*}{$t \in T; v \in L; u \in PP(v); u_t = p(v_t)$}
+  \\
+  
+  4.2 &
+  $a_{t,v,u} \rightarrow x_{t,u_t,u}$ &
+%  $t \in T; v \in L; u \in PP(v); u_t = p(v_t)$
   \\
   \hdashline
   
-  4.2 &
-  $(x_{t,v_t,v} \wedge x_{t,u_t,u}) \rightarrow a_{t,v,u}$ &
-  \multirow{2}{*}{$t \in T; v \in V; u \in PP(v); v_t \in V(t): u_t = p(v_t)$}
-  \\
-  
   4.3 &
+  $(x_{t,v_t,v} \wedge x_{t,u_t,u}) \rightarrow a_{t,v,u}$ &
+  \multirow{2}{*}{$t \in T; v \in V; u \in PP(v); v_t \in V(t); u_t = p(v_t)$}
+  \\
+
+  4.4 &
   $(x_{t,v_t,v} \wedge a_{t,v,u}) \rightarrow x_{t,u_t,u}$ &
 %  $t \in T; v \in V; u \in PP(v); v_t \in V(t): u_t = p(v_t)$
   \\
   \hdashline
 
-  4.4 &
+  4.5 &
   $x_{t,v_t,v} \rightarrow \neg x_{t,u_t,u}$ &
   $t \in T; v \in V; u \in V; v_t \in V(t); u_t = p(v_t): u < v$
   \\
@@ -684,17 +689,23 @@ These clauses are listed in section 1 of Table~\ref{child-parent-table}.
   \\
 
   4.3 &
-  $\neg u^r_{t,v} \rightarrow \neg u^r_{t,u}$ &
+  $(c_{u,v} \wedge \neg u^r_{t,v}) \rightarrow \neg u^r_{t,u}$ &
   %$t \in T; v \in R; u \in R \cap PP(v)$
   \\
-  
+
   \hdashline
   4.4 &
-  $\neg u^r_{t,v} \rightarrow \neg u_{t,u}$ &
-  $t \in T; v \in R; u \in V \cap PP(v)$
+  $(p^l_{v,u} \wedge \neg u^r_{t,v}) \rightarrow \neg u_{t,u}$ &
+  \multirow{2}{*}{$t \in T; v \in R; u \in V \cap PP(v)$}
   \\
 
   4.5 &
+  $(p^r_{v,u} \wedge \neg u^r_{t,v}) \rightarrow \neg u_{t,u}$ &
+  %$t \in T; v \in R; u \in V \cap PP(v)$
+  \\
+
+  \hdashline
+  4.6 &
   $c_{v,u} \rightarrow u^r_{t,v}$ &
   $t \in T; v \in R; u \in \left(V \cup L\right) \cap PC(v)$
   \\
